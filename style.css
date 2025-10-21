@@ -118,7 +118,7 @@ a {
 .app-content {
   width: 100%;
   max-width: 600px;
-  margin-top: 80px; /* Dejar espacio para el header fijo */
+  margin-top: 1rem; /* <-- CAMBIA ESTO (de 80px a 1rem) */
   padding: 1rem;
 }
 
@@ -161,3 +161,39 @@ a {
   font-size: 0.8rem;
   color: #888;
 }
+
+/* --- Estilos del Formulario de Crear Post --- */
+.create-post-container {
+  width: 100%;
+  max-width: 600px;
+  margin-top: 80px; /* Debajo del header fijo */
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+#create-post-form {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+#create-post-form h3 {
+  margin: 0 0 1rem 0;
+  text-align: center;
+}
+
+#create-post-form textarea {
+  width: 100%;
+  min-height: 80px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px;
+  font-family: inherit;
+  font-size: 1rem;
+  box-sizing: border-box;
+  margin-bottom: 1rem;
+  resize: vertical;
+}
+
+/* El botón de publicar usará los estilos de 'button' que ya tenemos */

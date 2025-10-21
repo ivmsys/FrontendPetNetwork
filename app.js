@@ -23,6 +23,8 @@ const loginError = document.getElementById('login-error');
 const registerError = document.getElementById('register-error');
 
 const feedContainer = document.getElementById('feed-container');
+const createPostForm = document.getElementById('create-post-form');
+const postError = document.getElementById('post-error');
 // --- 3. NAVEGACIÓN ENTRE VISTAS ---
 
 // Función para cambiar de vista
@@ -173,7 +175,46 @@ loginForm.addEventListener('submit', async (e) => {
     loginError.textContent = error.message;
   }
 });
+// Event Listener para el formulario de CREAR POST
+createPostForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  postError.textContent = '';
 
+  const content = document.getElementById('post-content').value;
+  
+  // 1. Obtener el token de localStorage
+  const token = localStorage.getItem('token');
+  if (!token) {
+    postError.textContent = 'Error: Debes iniciar sesión para publicar.';
+    showView('login-view'); // Envía al usuario al login
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/api/posts`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // 2. ¡Aquí enviamos el token para autenticarnos!
+        'Authorization': `Bearer ${token}` 
+      },
+      body: JSON.stringify({ content }), // (Por ahora solo enviamos el contenido)
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Error al crear el post');
+    }
+
+    // ¡Éxito!
+    document.getElementById('post-content').value = ''; // Limpia el textarea
+    loadFeed(); // 3. Recarga el feed para mostrar el nuevo post al instante
+
+  } catch (error) {
+    postError.textContent = error.message;
+  }
+});
 // --- 5. INICIALIZACIÓN ---
 // Comprobar si ya existe un token al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
