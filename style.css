@@ -85,3 +85,79 @@ a {
 .view.active {
   display: block; /* Muestra solo la vista que tenga la clase 'active' */
 }
+
+/* --- Estilos de la App Principal (Feed) --- */
+
+.app-header {
+  position: fixed; /* Fija el header arriba */
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #ffffff;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+#logout-button {
+  width: auto; /* Ancho automático para el botón de logout */
+  padding: 0.5rem 1rem;
+  background-color: #f0f2f5;
+  color: #1877f2;
+  font-weight: bold;
+}
+
+.app-content {
+  width: 100%;
+  max-width: 600px;
+  margin-top: 80px; /* Dejar espacio para el header fijo */
+  padding: 1rem;
+}
+
+.app-content h2 {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+/* Estilos para cada "Tarjeta" de Post */
+.post-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.post-card .post-author {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.post-card .post-pet {
+  font-size: 0.9rem;
+  color: #1877f2;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.post-card .post-content {
+  font-size: 1rem;
+  color: #1c1e21;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+}
+
+.post-card .post-timestamp {
+  font-size: 0.8rem;
+  color: #888;
+}

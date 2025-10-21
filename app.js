@@ -22,6 +22,7 @@ const logoutButton = document.getElementById('logout-button');
 const loginError = document.getElementById('login-error');
 const registerError = document.getElementById('register-error');
 
+const feedContainer = document.getElementById('feed-container');
 // --- 3. NAVEGACIÓN ENTRE VISTAS ---
 
 // Función para cambiar de vista
@@ -51,7 +52,57 @@ logoutButton.addEventListener('click', () => {
 });
 
 // --- 4. LÓGICA DE AUTENTICACIÓN ---
+// --- FUNCIÓN PARA CARGAR EL FEED ---
+async function loadFeed() {
+  // Mostramos un mensaje de carga
+  feedContainer.innerHTML = '<p>Cargando publicaciones...</p>';
 
+  try {
+    // Llamamos a nuestra API (endpoint público)
+    const response = await fetch(`${API_URL}/api/posts`);
+    const posts = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Error al cargar el feed');
+    }
+
+    // Limpiamos el contenedor
+    feedContainer.innerHTML = '';
+
+    if (posts.length === 0) {
+      feedContainer.innerHTML = '<p>No hay publicaciones todavía. ¡Sé el primero!</p>';
+      return;
+    }
+
+    // Iteramos sobre cada post y creamos su HTML
+    posts.forEach(post => {
+      const postElement = document.createElement('div');
+      postElement.className = 'post-card';
+
+      // Formatear la fecha (opcional pero se ve bien)
+      const postDate = new Date(post.created_at).toLocaleString('es-ES', {
+        day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit'
+      });
+
+      // HTML para la tarjeta del post
+      postElement.innerHTML = `
+        <div class="post-author">${post.author_username}</div>
+        
+        ${post.pet_name ? 
+          `<div class="post-pet">Etiquetando a: ${post.pet_name}</div>` : 
+          ''}
+        
+        <p class="post-content">${post.content}</p>
+        <div class="post-timestamp">${postDate}</div>
+      `;
+      
+      feedContainer.appendChild(postElement);
+    });
+
+  } catch (error) {
+    feedContainer.innerHTML = `<p class="error-message">Error al cargar el feed: ${error.message}</p>`;
+  }
+}
 // Event Listener para el formulario de REGISTRO
 registerForm.addEventListener('submit', async (e) => {
   e.preventDefault(); // Evita que el formulario recargue la página
@@ -116,7 +167,7 @@ loginForm.addEventListener('submit', async (e) => {
     
     // Mostramos la app principal
     showView('app-view');
-    // (En el siguiente paso, aquí llamaremos a la función para cargar el feed)
+    loadFeed();
 
   } catch (error) {
     loginError.textContent = error.message;
@@ -130,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (token) {
     // Si hay token, mostramos la app (luego verificaremos si es válido)
     showView('app-view');
-    // (Aquí llamaremos a la función para cargar el feed)
+    loadFeed();
   } else {
     // Si no hay token, mostramos el login
     showView('login-view');
