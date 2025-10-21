@@ -11,7 +11,7 @@ btn.addEventListener('click', () => {
   resultadoDiv.innerText = 'Cargando...';
 
   // 3. Usar fetch para llamar a la ruta /pingdb de tu API
-  fetch(`${API_URL}/pingdb`)
+  fetch('${API_URL}/pingdb')
     .then(response => {
       // Si la respuesta no es OK (ej. 404 o 500)
       if (!response.ok) {
