@@ -3,16 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Red Social de Mascotas</title>
-  <style>
-    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
-    #resultado { margin-top: 20px; font-weight: bold; }
-  </style>
+  <title>PetNet - Red Social de Mascotas</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Prueba de Conexión API</h1>
-  <button id="btnProbar">Probar Conexión con la API</button>
-  <div id="resultado">...</div>
+
+  <div id="login-view" class="view active">
+    <div class="form-container">
+      <h1>PetNet</h1>
+      <h2>Iniciar Sesión</h2>
+      <form id="login-form">
+        <input type="email" id="login-email" placeholder="Email" required>
+        <input type="password" id="login-password" placeholder="Contraseña" required>
+        <button type="submit">Entrar</button>
+      </form>
+      <p>¿No tienes cuenta? <a href="#" id="show-register">Regístrate</a></p>
+      <p id="login-error" class="error-message"></p>
+    </div>
+  </div>
+
+  <div id="register-view" class="view">
+    <div class="form-container">
+      <h1>Regístrate</h1>
+      <form id="register-form">
+        <input type="text" id="register-username" placeholder="Nombre de usuario" required>
+        <input type="email" id="register-email" placeholder="Email" required>
+        <input type="password" id="register-password" placeholder="Contraseña (mín. 6 caracteres)" required>
+        <button type="submit">Crear Cuenta</button>
+      </form>
+      <p>¿Ya tienes cuenta? <a href="#" id="show-login">Inicia Sesión</a></p>
+      <p id="register-error" class="error-message"></p>
+    </div>
+  </div>
+
+  <div id="app-view" class="view">
+    <h1>¡Bienvenido a PetNet!</h1>
+    <p>Aquí irá el feed de publicaciones.</p>
+    <button id="logout-button">Cerrar Sesión</button>
+  </div>
 
   <script src="app.js"></script>
 </body>
