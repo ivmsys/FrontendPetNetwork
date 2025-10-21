@@ -39,9 +39,10 @@
   <div id="app-view" class="view">
 
   <header class="app-header">
-    <h1>PetNet</h1>
-    <button id="logout-button">Cerrar Sesión</button>
-  </header>
+  <h1>PetNet</h1>
+  <div> <a href="#" id="show-profile-link" class="header-link">Mi Perfil</a> <button id="logout-button">Cerrar Sesión</button>
+  </div>
+</header>
 
   <div class="create-post-container">
     <form id="create-post-form">
@@ -60,7 +61,43 @@
     </div>
   </main>
 </div>
+<div id="profile-view" class="view">
+  <header class="app-header">
+    <h1>Mi Perfil</h1>
+    <div>
+      <a href="#" id="back-to-feed-link" class="header-link">Volver al Feed</a>
+    </div>
+  </header>
 
-  <script src="app.js"></script>
+  <main class="profile-content">
+
+    <div class="profile-section" id="user-info-container">
+      <h2>Mi Información</h2>
+      <p>Cargando...</p>
+    </div>
+
+    <div class="profile-section">
+      <h2>Registrar una Mascota</h2>
+      <form id="register-pet-form" class="form-container" style="max-width: none;">
+        <input type="text" id="pet-name" placeholder="Nombre de la mascota" required>
+        <input type="text" id="pet-species" placeholder="Especie (ej. Perro, Gato)">
+        <input type="text" id="pet-breed" placeholder="Raza (ej. Jack Russell)">
+        <input type="date" id="pet-birthdate" placeholder="Fecha de nacimiento">
+        <button type="submit">Registrar Mascota</button>
+        <p id="pet-register-error" class="error-message"></p>
+      </form>
+    </div>
+
+    <div class="profile-section">
+      <h2>Mis Mascotas</h2>
+      <div id="pet-list-container">
+        <p>No tienes mascotas registradas.</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>

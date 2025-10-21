@@ -25,6 +25,14 @@ const registerError = document.getElementById('register-error');
 const feedContainer = document.getElementById('feed-container');
 const createPostForm = document.getElementById('create-post-form');
 const postError = document.getElementById('post-error');
+const profileView = document.getElementById('profile-view');
+const showProfileLink = document.getElementById('show-profile-link');
+const backToFeedLink = document.getElementById('back-to-feed-link');
+const userInfoContainer = document.getElementById('user-info-container');
+const petListContainer = document.getElementById('pet-list-container');
+const registerPetForm = document.getElementById('register-pet-form');
+const petRegisterError = document.getElementById('pet-register-error');
+
 // --- 3. NAVEGACIÓN ENTRE VISTAS ---
 
 // Función para cambiar de vista
@@ -51,6 +59,17 @@ showLoginLink.addEventListener('click', (e) => {
 logoutButton.addEventListener('click', () => {
   localStorage.removeItem('token'); // Borra el token
   showView('login-view'); // Muestra la pantalla de login
+});
+showProfileLink.addEventListener('click', (e) => {
+  e.preventDefault();
+  showView('profile-view');
+  loadProfilePage(); // Carga los datos del perfil
+});
+
+backToFeedLink.addEventListener('click', (e) => {
+  e.preventDefault();
+  showView('app-view');
+  loadFeed(); // Recarga el feed por si acaso
 });
 
 // --- 4. LÓGICA DE AUTENTICACIÓN ---
@@ -105,6 +124,79 @@ async function loadFeed() {
     feedContainer.innerHTML = `<p class="error-message">Error al cargar el feed: ${error.message}</p>`;
   }
 }
+
+// --- FUNCIÓN PARA CARGAR LA PÁGINA DE PERFIL ---
+async function loadProfilePage() {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    showView('login-view'); // Si no hay token, fuera
+    return;
+  }
+
+  // Preparamos los headers con el token
+  const headers = {
+    'Authorization': `Bearer ${token}`
+  };
+
+  try {
+    // Hacemos las dos peticiones a la API en paralelo
+    const [userResponse, petsResponse] = await Promise.all([
+      fetch(`${API_URL}/api/users/me`, { headers }),
+      fetch(`${API_URL}/api/pets`, { headers })
+    ]);
+
+    if (!userResponse.ok || !petsResponse.ok) {
+      throw new Error('Error al cargar los datos del perfil');
+    }
+
+    const userData = await userResponse.json();
+    const petsData = await petsResponse.json();
+
+    // 1. Renderizar la información del usuario
+    userInfoContainer.innerHTML = `
+      <h2>Mi Información</h2>
+      <p><strong>Usuario:</strong> ${userData.username}</p>
+      <p><strong>Email:</strong> ${userData.email}</p>
+      <p><strong>Miembro desde:</strong> ${new Date(userData.created_at).toLocaleDateString()}</p>
+    `;
+
+    // 2. Renderizar la lista de mascotas
+    petListContainer.innerHTML = ''; // Limpia el contenedor
+    if (petsData.length === 0) {
+      petListContainer.innerHTML = '<p>No tienes mascotas registradas.</p>';
+    } else {
+      petsData.forEach(pet => {
+        const petCard = document.createElement('div');
+        petCard.className = 'pet-card';
+
+        const birthDate = pet.birth_date ? new Date(pet.birth_date).toLocaleDateString() : 'Desconocida';
+
+        // Si la mascota no tiene foto, usamos un placeholder
+        const petImage = pet.profile_picture_url || 'https://via.placeholder.com/100';
+
+        petCard.innerHTML = `
+          <img src="${petImage}" alt="Foto de ${pet.name}">
+          <div class="pet-card-info">
+            <h3>${pet.name}</h3>
+            <p><strong>Especie:</strong> ${pet.species || 'No especificada'}</p>
+            <p><strong>Raza:</strong> ${pet.breed || 'No especificada'}</p>
+            <p><strong>Nacimiento:</strong> ${birthDate}</p>
+
+            <form class="upload-pet-photo-form" data-pet-id="${pet.pet_id}">
+              <input type="file" name="image" required>
+              <button type="submit">Subir Foto</button>
+            </form>
+          </div>
+        `;
+        petListContainer.appendChild(petCard);
+      });
+    }
+  } catch (error) {
+    userInfoContainer.innerHTML = `<p class="error-message">${error.message}</p>`;
+    petListContainer.innerHTML = '';
+  }
+}
+
 // Event Listener para el formulario de REGISTRO
 registerForm.addEventListener('submit', async (e) => {
   e.preventDefault(); // Evita que el formulario recargue la página
@@ -213,6 +305,100 @@ createPostForm.addEventListener('submit', async (e) => {
 
   } catch (error) {
     postError.textContent = error.message;
+  }
+});
+
+// Event Listener para el formulario de REGISTRAR MASCOTA
+registerPetForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  petRegisterError.textContent = '';
+
+  const token = localStorage.getItem('token');
+  if (!token) {
+    showView('login-view');
+    return;
+  }
+
+  // Recolectar datos del formulario
+  const petData = {
+    name: document.getElementById('pet-name').value,
+    species: document.getElementById('pet-species').value,
+    breed: document.getElementById('pet-breed').value,
+    birthDate: document.getElementById('pet-birthdate').value || null
+  };
+
+  try {
+    const response = await fetch(`${API_URL}/api/pets`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(petData)
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Error al registrar mascota');
+    }
+
+    // Éxito: Limpiar formulario y recargar la lista
+    registerPetForm.reset();
+    loadProfilePage(); // Recarga toda la info del perfil
+
+  } catch (error) {
+    petRegisterError.textContent = error.message;
+  }
+});
+
+// Event Listener (delegado) para TODOS los formularios de SUBIR FOTO
+petListContainer.addEventListener('submit', async (e) => {
+  // Solo nos interesan los formularios con esta clase
+  if (!e.target.classList.contains('upload-pet-photo-form')) {
+    return;
+  }
+
+  e.preventDefault();
+
+  const token = localStorage.getItem('token');
+  if (!token) {
+    showView('login-view');
+    return;
+  }
+
+  const form = e.target;
+  const petId = form.dataset.petId; // Obtenemos el ID de la mascota
+  const fileInput = form.querySelector('input[type="file"]');
+
+  if (!fileInput.files || fileInput.files.length === 0) {
+    alert('Por favor, selecciona un archivo.');
+    return;
+  }
+
+  // Usamos FormData para enviar archivos
+  const formData = new FormData();
+  formData.append('image', fileInput.files[0]);
+
+  try {
+    const response = await fetch(`${API_URL}/api/pets/${petId}/upload-picture`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+        // NO se pone 'Content-Type', el navegador lo hace solo con FormData
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Error al subir la foto');
+    }
+
+    // Éxito: Recargar la info del perfil para mostrar la nueva foto
+    loadProfilePage();
+
+  } catch (error) {
+    alert(error.message);
   }
 });
 // --- 5. INICIALIZACIÓN ---
