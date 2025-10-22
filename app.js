@@ -74,21 +74,27 @@ backToFeedLink.addEventListener('click', (e) => {
 
 // --- 4. LÓGICA DE AUTENTICACIÓN ---
 // --- FUNCIÓN PARA CARGAR EL FEED ---
+// --- FUNCIÓN PARA CARGAR EL FEED ---
 async function loadFeed() {
-  // Mostramos un mensaje de carga
   feedContainer.innerHTML = '<p>Cargando publicaciones...</p>';
 
   try {
-    // Llamamos a nuestra API (endpoint público)
-    const response = await fetch(`${API_URL}/api/posts`);
+    // Preparar headers. Si hay token, lo enviamos.
+    const token = localStorage.getItem('token');
+    const headers = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    // Llamamos a nuestra API
+    const response = await fetch(`${API_URL}/api/posts`, { headers });
     const posts = await response.json();
 
     if (!response.ok) {
       throw new Error(data.message || 'Error al cargar el feed');
     }
 
-    // Limpiamos el contenedor
-    feedContainer.innerHTML = '';
+    feedContainer.innerHTML = ''; // Limpia el contenedor
 
     if (posts.length === 0) {
       feedContainer.innerHTML = '<p>No hay publicaciones todavía. ¡Sé el primero!</p>';
@@ -100,10 +106,12 @@ async function loadFeed() {
       const postElement = document.createElement('div');
       postElement.className = 'post-card';
 
-      // Formatear la fecha (opcional pero se ve bien)
       const postDate = new Date(post.created_at).toLocaleString('es-ES', {
         day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit'
       });
+      
+      // Añadimos la clase 'liked' o 'not-liked'
+      const likedClass = post.user_has_liked ? 'liked' : 'not-liked';
 
       // HTML para la tarjeta del post
       postElement.innerHTML = `
@@ -115,6 +123,13 @@ async function loadFeed() {
         
         <p class="post-content">${post.content}</p>
         <div class="post-timestamp">${postDate}</div>
+        
+        <div class="post-actions">
+          <button class="like-button ${likedClass}" data-post-id="${post.post_id}">
+            ❤️
+          </button>
+          <span class="like-count">${post.like_count}</span>
+        </div>
       `;
       
       feedContainer.appendChild(postElement);
@@ -401,6 +416,54 @@ petListContainer.addEventListener('submit', async (e) => {
     alert(error.message);
   }
 });
+
+// ... (al final de app.js)
+
+// Event Listener (delegado) para TODOS los botones de "Me Gusta"
+feedContainer.addEventListener('click', async (e) => {
+  // Solo nos interesan los botones con esta clase
+  if (!e.target.classList.contains('like-button')) {
+    return;
+  }
+  
+  const button = e.target;
+  const postId = button.dataset.postId;
+  
+  const token = localStorage.getItem('token');
+  if (!token) {
+    // Si no está logeado, lo manda al login
+    alert('Debes iniciar sesión para dar "me gusta".');
+    showView('login-view');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/api/posts/${postId}/like`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Error al procesar el like');
+    }
+
+    // ¡Éxito! Actualizamos la UI al instante
+    const likeCountSpan = button.nextElementSibling; // El <span> del conteo
+    likeCountSpan.textContent = data.newLikeCount;
+    
+    // Alternamos la clase del botón
+    button.classList.toggle('liked', data.userHasLiked);
+    button.classList.toggle('not-liked', !data.userHasLiked);
+
+  } catch (error) {
+    alert(error.message);
+  }
+});
+
 // --- 5. INICIALIZACIÓN ---
 // Comprobar si ya existe un token al cargar la página
 document.addEventListener('DOMContentLoaded', () => {

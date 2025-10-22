@@ -283,3 +283,43 @@ a {
   font-size: 0.8rem;
   margin-left: 0.5rem;
 }
+
+/* --- Estilos del Botón "Me Gusta" --- */
+
+.post-actions {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.like-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem; /* Hace el corazón más grande */
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+  transition: transform 0.1s ease;
+}
+
+.like-button:hover {
+  transform: scale(1.1);
+}
+
+.like-button.liked {
+  /* El color rojo cuando SÍ le diste "me gusta" */
+  filter: grayscale(0%);
+}
+
+.like-button.not-liked {
+  /* El color gris cuando NO le diste "me gusta" */
+  filter: grayscale(100%);
+  opacity: 0.7;
+}
+
+.like-count {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #555;
+}
