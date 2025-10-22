@@ -434,3 +434,93 @@ a {
   border-radius: 50%;
   object-fit: cover;
 }
+
+/* --- Estilos de Subida de Media --- */
+
+/* Botón de añadir media (+) */
+#add-media-button {
+  width: auto;
+  padding: 0.5rem 0.8rem;
+  font-size: 1.5rem; /* Más grande */
+  font-weight: bold;
+  background-color: #f0f2f5;
+  color: #555;
+  flex-grow: 0;
+  margin-left: 0.5rem; /* Separación del @ */
+}
+#add-media-button:hover {
+  background-color: #e4e6eb;
+}
+
+/* Contenedor de las Vistas Previas */
+#post-media-preview-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.media-preview-item {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.media-preview-item img,
+.media-preview-item video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.media-preview-remove-btn {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 20px;
+  text-align: center;
+  padding: 0;
+}
+
+/* Estilos para el Media en el Feed */
+.post-media-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 columnas */
+  gap: 0.25rem;
+  margin-top: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.post-media-item img,
+.post-media-item video {
+  width: 100%;
+  height: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  background-color: #f0f2f5;
+}
+
+/* Si solo hay 1, ocupa todo */
+.post-media-container.count-1 { grid-template-columns: 1fr; }
+/* Si hay 3, la primera es grande */
+.post-media-container.count-3 {
+  grid-template-columns: 1fr 1fr;
+}
+.post-media-container.count-3 .post-media-item:first-child {
+  grid-column: 1 / 3; /* Ocupa 2 columnas */
+  grid-row: 1 / 2;
+}
+/* Si hay 4, es un grid 2x2 */
+.post-media-container.count-4 { grid-template-columns: 1fr 1fr; }

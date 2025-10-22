@@ -4,6 +4,7 @@
 const API_URL = 'https://petnet-tuyr.onrender.com';
 let userPets = []; // Guardará la lista de mascotas del usuario
 let selectedPetTags = []; // Guardará las mascotas seleccionadas para un post
+let selectedPostFiles = []; // Guardará los archivos de media seleccionados
 // --- 2. ELEMENTOS DEL DOM ---
 // Vistas (pantallas)
 const loginView = document.getElementById('login-view');
@@ -38,6 +39,9 @@ const petTagsContainer = document.getElementById('pet-tags-container');
 const petSelectionModal = document.getElementById('pet-selection-modal');
 const petSelectionList = document.getElementById('pet-selection-list');
 const closeModalButton = document.getElementById('close-modal-button');
+const addMediaButton = document.getElementById('add-media-button');
+const postMediaInput = document.getElementById('post-media-input');
+const postMediaPreviewContainer = document.getElementById('post-media-preview-container');
 // --- 3. NAVEGACIÓN ENTRE VISTAS ---
 
 // Función para cambiar de vista
@@ -118,17 +122,36 @@ async function loadFeed() {
       // Añadimos la clase 'liked' o 'not-liked'
       const likedClass = post.user_has_liked ? 'liked' : 'not-liked';
 
+      // ¡NUEVO! Crear el HTML para el grid de media
+      let mediaHtml = '';
+      if (post.media && post.media.length > 0) {
+        mediaHtml = `<div class="post-media-container count-${post.media.length}">`;
+
+        post.media.forEach(m => {
+          mediaHtml += `<div class="post-media-item">`;
+          if (m.type === 'image') {
+            mediaHtml += `<img src="${m.url}" alt="Media del post">`;
+          } else if (m.type === 'video') {
+            mediaHtml += `<video src="${m.url}" controls></video>`;
+          }
+          mediaHtml += `</div>`;
+        });
+
+        mediaHtml += `</div>`;
+      }
+
       // HTML para la tarjeta del post
       postElement.innerHTML = `
         <div class="post-author">${post.author_username}</div>
-        
+
         ${post.tagged_pets && post.tagged_pets.length > 0 ? 
-        `<div class="post-pet">Etiquetando a: ${post.tagged_pets.map(pet => pet.name).join(', ')}</div>` : 
-        ''}
-        
+          `<div class="post-pet">Etiquetando a: ${post.tagged_pets.map(pet => pet.name).join(', ')}</div>` : 
+          ''}
+
         <p class="post-content">${post.content}</p>
-        <div class="post-timestamp">${postDate}</div>
-        
+
+        ${mediaHtml} <div class="post-timestamp">${postDate}</div>
+
         <div class="post-actions">
           <button class="like-button ${likedClass}" data-post-id="${post.post_id}">
             ❤️
@@ -136,8 +159,8 @@ async function loadFeed() {
           <span class="like-count">${post.like_count}</span>
         </div>
       `;
-      
-      feedContainer.appendChild(postElement);
+
+    feedContainer.appendChild(postElement);
     });
 
   } catch (error) {
@@ -306,13 +329,13 @@ loginForm.addEventListener('submit', async (e) => {
 });
 // Event Listener para el formulario de CREAR POST
 // Event Listener para el formulario de CREAR POST (¡ACTUALIZADO!)
+// Event Listener para el formulario de CREAR POST (¡ACTUALIZADO con FormData!)
 createPostForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   postError.textContent = '';
 
   const content = document.getElementById('post-content').value;
 
-  // 1. Obtener el token
   const token = localStorage.getItem('token');
   if (!token) {
     postError.textContent = 'Error: Debes iniciar sesión para publicar.';
@@ -320,17 +343,29 @@ createPostForm.addEventListener('submit', async (e) => {
     return;
   }
 
-  // 2. ¡NUEVO! Obtener los IDs de las mascotas etiquetadas
+  // ¡Usamos FormData para enviar archivos y texto!
+  const formData = new FormData();
+
+  // 1. Añadir los datos de texto
+  formData.append('content', content);
+
+  // 2. Añadir los petIds (como un string JSON)
   const petIds = selectedPetTags.map(pet => pet.pet_id);
+  formData.append('petIds', JSON.stringify(petIds));
+
+  // 3. Añadir los archivos (con la key 'media')
+  selectedPostFiles.forEach(file => {
+    formData.append('media', file);
+  });
 
   try {
     const response = await fetch(`${API_URL}/api/posts`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        // ¡NO pongas 'Content-Type'! El navegador lo hace solo.
         'Authorization': `Bearer ${token}` 
       },
-      body: JSON.stringify({ content, petIds }), // <-- ¡AQUÍ LOS ENVIAMOS!
+      body: formData // Enviamos el objeto FormData
     });
 
     const data = await response.json();
@@ -339,11 +374,13 @@ createPostForm.addEventListener('submit', async (e) => {
       throw new Error(data.message || 'Error al crear el post');
     }
 
-    // ¡Éxito!
-    document.getElementById('post-content').value = ''; // Limpia el textarea
-    selectedPetTags = []; // Limpia el estado
-    renderSelectedPetTags(); // Limpia las "píldoras"
-    loadFeed(); // Recarga el feed para mostrar el nuevo post
+    // ¡Éxito! Limpiar todo
+    document.getElementById('post-content').value = '';
+    selectedPetTags = [];
+    selectedPostFiles = [];
+    renderSelectedPetTags();
+    renderPostMediaPreviews();
+    loadFeed(); // Recarga el feed
 
   } catch (error) {
     postError.textContent = error.message;
@@ -491,19 +528,78 @@ feedContainer.addEventListener('click', async (e) => {
   }
 });
 
-// --- 5. INICIALIZACIÓN ---
-// Comprobar si ya existe un token al cargar la página
-document.addEventListener('DOMContentLoaded', () => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    // Si hay token, mostramos la app (luego verificaremos si es válido)
-    showView('app-view');
-    loadFeed();
-    loadUserPets();
-  } else {
-    // Si no hay token, mostramos el login
-    showView('login-view');
+// --- LÓGICA DE SUBIDA DE MEDIA ---
+
+// 1. Abrir el input de archivo al hacer clic en '+'
+addMediaButton.addEventListener('click', () => {
+  postMediaInput.click();
+});
+
+// 2. Manejar la selección de archivos
+postMediaInput.addEventListener('change', (e) => {
+  if (!e.target.files) return;
+
+  const files = Array.from(e.target.files);
+
+  // Limitar a 4 archivos
+  const totalFiles = selectedPostFiles.length + files.length;
+  if (totalFiles > 4) {
+    alert('Puedes subir un máximo de 4 archivos por post.');
+    // Resetea el input
+    postMediaInput.value = '';
+    return;
   }
+
+  // Añadir los nuevos archivos al estado
+  selectedPostFiles.push(...files);
+
+  // Mostrar las vistas previas
+  renderPostMediaPreviews();
+
+  // Resetea el input para poder añadir el mismo archivo si se borra
+  postMediaInput.value = '';
+});
+
+// 3. Función para renderizar las vistas previas
+function renderPostMediaPreviews() {
+  postMediaPreviewContainer.innerHTML = '';
+
+  selectedPostFiles.forEach((file, index) => {
+    const previewItem = document.createElement('div');
+    previewItem.className = 'media-preview-item';
+
+    const fileType = file.type.startsWith('video') ? 'video' : 'image';
+    const fileUrl = URL.createObjectURL(file); // Crea una URL local temporal
+
+    if (fileType === 'image') {
+      previewItem.innerHTML = `<img src="${fileUrl}" alt="Vista previa">`;
+    } else {
+      previewItem.innerHTML = `<video src="${fileUrl}" muted></video>`; // 'muted' para evitar errores
+    }
+
+    // Añadir botón de borrar
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'media-preview-remove-btn';
+    removeBtn.innerHTML = '&times;';
+    removeBtn.dataset.index = index; // Guardamos el índice del archivo
+    previewItem.appendChild(removeBtn);
+
+    postMediaPreviewContainer.appendChild(previewItem);
+  });
+}
+
+// 4. Listener para borrar una vista previa
+postMediaPreviewContainer.addEventListener('click', (e) => {
+  const removeButton = e.target.closest('.media-preview-remove-btn');
+  if (!removeButton) return;
+
+  const indexToRemove = parseInt(removeButton.dataset.index, 10);
+
+  // Quitar del array de estado
+  selectedPostFiles.splice(indexToRemove, 1);
+
+  // Volver a renderizar
+  renderPostMediaPreviews();
 });
 
 // --- LÓGICA DE ETIQUETADO DE MASCOTAS ---
@@ -601,3 +697,21 @@ petTagsContainer.addEventListener('click', (e) => {
   // Volver a renderizar las "píldoras"
   renderSelectedPetTags();
 });
+
+
+
+// --- 5. INICIALIZACIÓN ---
+// Comprobar si ya existe un token al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    // Si hay token, mostramos la app (luego verificaremos si es válido)
+    showView('app-view');
+    loadFeed();
+    loadUserPets();
+  } else {
+    // Si no hay token, mostramos el login
+    showView('login-view');
+  }
+});
+

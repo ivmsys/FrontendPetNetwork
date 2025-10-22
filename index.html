@@ -50,13 +50,16 @@
     
     <div id="pet-tags-container">
       </div>
-    
+      <div id="post-media-preview-container">
+      </div>
     <textarea id="post-content" placeholder="¿Qué estás pensando, humano?" required></textarea>
     
     <div class="post-toolbar">
       <button type="button" id="tag-pet-button" title="Etiquetar mascota">@</button>
-      <button type="submit" class="submit-post-button">Publicar</button>
+      <button type="button" id="add-media-button" title="Añadir foto/video">+</button> <button type="submit" class="submit-post-button">Publicar</button>
     </div>
+
+    <input type_=""file"_ id="post-media-input" multiple accept="image/*,video/*" style="display: none;">
     
     <p id="post-error" class="error-message"></p>
   </form>
