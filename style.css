@@ -328,3 +328,109 @@ a {
   font-weight: bold;
   color: #555;
 }
+
+/* --- Estilos de Etiquetado de Mascotas --- */
+
+.post-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+#tag-pet-button {
+  width: auto;
+  padding: 0.5rem 0.8rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  background-color: #f0f2f5;
+  color: #555;
+  flex-grow: 0;
+}
+#tag-pet-button:hover {
+  background-color: #e4e6eb;
+}
+
+.submit-post-button {
+  flex-grow: 1; /* El botón de Publicar ocupa el resto */
+  margin-left: 0.5rem;
+}
+
+/* Estilos para las "píldoras" de etiquetas */
+#pet-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.pet-tag-pill {
+  display: inline-flex;
+  align-items: center;
+  background-color: #e7f3ff;
+  color: #1877f2;
+  border-radius: 15px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.pet-tag-remove-btn {
+  background: none;
+  border: none;
+  color: #1877f2;
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-left: 0.25rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+/* Estilos para el Modal (Menú) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+}
+
+#pet-selection-list {
+  max-height: 200px;
+  overflow-y: auto;
+  margin: 1rem 0;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.pet-selection-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  cursor: pointer;
+}
+.pet-selection-item:hover {
+  background-color: #f0f2f5;
+}
+
+.pet-selection-item img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}

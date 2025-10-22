@@ -45,13 +45,31 @@
 </header>
 
   <div class="create-post-container">
-    <form id="create-post-form">
-      <h3>Crear una publicación</h3>
-      <textarea id="post-content" placeholder="¿Qué estás pensando?" required></textarea>
-      <button type="submit">Publicar</button>
-      <p id="post-error" class="error-message"></p>
-    </form>
+  <form id="create-post-form">
+    <h3>Crear una publicación</h3>
+    
+    <div id="pet-tags-container">
+      </div>
+    
+    <textarea id="post-content" placeholder="¿Qué estás pensando, humano?" required></textarea>
+    
+    <div class="post-toolbar">
+      <button type="button" id="tag-pet-button" title="Etiquetar mascota">@</button>
+      <button type="submit" class="submit-post-button">Publicar</button>
+    </div>
+    
+    <p id="post-error" class="error-message"></p>
+  </form>
+</div>
+
+<div id="pet-selection-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-content">
+    <h3>Etiquetar a...</h3>
+    <div id="pet-selection-list">
+      </div>
+    <button type="button" id="close-modal-button">Cerrar</button>
   </div>
+</div>
   
   
   <main class="app-content">

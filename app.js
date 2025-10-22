@@ -2,7 +2,8 @@
 // --- 1. CONFIGURACIÓN ---
 // ¡¡¡CAMBIA ESTA URL POR LA TUYA DE RENDER!!!
 const API_URL = 'https://petnet-tuyr.onrender.com';
-
+let userPets = []; // Guardará la lista de mascotas del usuario
+let selectedPetTags = []; // Guardará las mascotas seleccionadas para un post
 // --- 2. ELEMENTOS DEL DOM ---
 // Vistas (pantallas)
 const loginView = document.getElementById('login-view');
@@ -32,7 +33,11 @@ const userInfoContainer = document.getElementById('user-info-container');
 const petListContainer = document.getElementById('pet-list-container');
 const registerPetForm = document.getElementById('register-pet-form');
 const petRegisterError = document.getElementById('pet-register-error');
-
+const tagPetButton = document.getElementById('tag-pet-button');
+const petTagsContainer = document.getElementById('pet-tags-container');
+const petSelectionModal = document.getElementById('pet-selection-modal');
+const petSelectionList = document.getElementById('pet-selection-list');
+const closeModalButton = document.getElementById('close-modal-button');
 // --- 3. NAVEGACIÓN ENTRE VISTAS ---
 
 // Función para cambiar de vista
@@ -117,9 +122,9 @@ async function loadFeed() {
       postElement.innerHTML = `
         <div class="post-author">${post.author_username}</div>
         
-        ${post.pet_name ? 
-          `<div class="post-pet">Etiquetando a: ${post.pet_name}</div>` : 
-          ''}
+        ${post.tagged_pets && post.tagged_pets.length > 0 ? 
+        `<div class="post-pet">Etiquetando a: ${post.tagged_pets.map(pet => pet.name).join(', ')}</div>` : 
+        ''}
         
         <p class="post-content">${post.content}</p>
         <div class="post-timestamp">${postDate}</div>
@@ -212,6 +217,23 @@ async function loadProfilePage() {
   }
 }
 
+// --- FUNCIÓN PARA CARGAR LAS MASCOTAS DEL USUARIO ---
+// (La usaremos para el menú de etiquetado)
+async function loadUserPets() {
+  const token = localStorage.getItem('token');
+  if (!token) return; // No hacer nada si no hay token
+
+  try {
+    const response = await fetch(`${API_URL}/api/pets`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error('No se pudieron cargar las mascotas');
+
+    userPets = await response.json(); // Guarda las mascotas en la variable global
+  } catch (error) {
+    console.error(error.message);
+  }
+}
 // Event Listener para el formulario de REGISTRO
 registerForm.addEventListener('submit', async (e) => {
   e.preventDefault(); // Evita que el formulario recargue la página
@@ -277,35 +299,38 @@ loginForm.addEventListener('submit', async (e) => {
     // Mostramos la app principal
     showView('app-view');
     loadFeed();
-
+    loadUserPets();
   } catch (error) {
     loginError.textContent = error.message;
   }
 });
 // Event Listener para el formulario de CREAR POST
+// Event Listener para el formulario de CREAR POST (¡ACTUALIZADO!)
 createPostForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   postError.textContent = '';
 
   const content = document.getElementById('post-content').value;
-  
-  // 1. Obtener el token de localStorage
+
+  // 1. Obtener el token
   const token = localStorage.getItem('token');
   if (!token) {
     postError.textContent = 'Error: Debes iniciar sesión para publicar.';
-    showView('login-view'); // Envía al usuario al login
+    showView('login-view');
     return;
   }
+
+  // 2. ¡NUEVO! Obtener los IDs de las mascotas etiquetadas
+  const petIds = selectedPetTags.map(pet => pet.pet_id);
 
   try {
     const response = await fetch(`${API_URL}/api/posts`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // 2. ¡Aquí enviamos el token para autenticarnos!
         'Authorization': `Bearer ${token}` 
       },
-      body: JSON.stringify({ content }), // (Por ahora solo enviamos el contenido)
+      body: JSON.stringify({ content, petIds }), // <-- ¡AQUÍ LOS ENVIAMOS!
     });
 
     const data = await response.json();
@@ -316,7 +341,9 @@ createPostForm.addEventListener('submit', async (e) => {
 
     // ¡Éxito!
     document.getElementById('post-content').value = ''; // Limpia el textarea
-    loadFeed(); // 3. Recarga el feed para mostrar el nuevo post al instante
+    selectedPetTags = []; // Limpia el estado
+    renderSelectedPetTags(); // Limpia las "píldoras"
+    loadFeed(); // Recarga el feed para mostrar el nuevo post
 
   } catch (error) {
     postError.textContent = error.message;
@@ -472,8 +499,105 @@ document.addEventListener('DOMContentLoaded', () => {
     // Si hay token, mostramos la app (luego verificaremos si es válido)
     showView('app-view');
     loadFeed();
+    loadUserPets();
   } else {
     // Si no hay token, mostramos el login
     showView('login-view');
   }
+});
+
+// --- LÓGICA DE ETIQUETADO DE MASCOTAS ---
+
+// 1. Mostrar el modal al hacer clic en @
+tagPetButton.addEventListener('click', () => {
+  renderPetSelectionModal();
+  petSelectionModal.style.display = 'flex';
+});
+
+// 2. Cerrar el modal
+closeModalButton.addEventListener('click', () => {
+  petSelectionModal.style.display = 'none';
+});
+// (Opcional) Cerrar si se hace clic fuera del contenido
+petSelectionModal.addEventListener('click', (e) => {
+  if (e.target === petSelectionModal) {
+    petSelectionModal.style.display = 'none';
+  }
+});
+
+// 3. Función para renderizar la lista de mascotas en el modal
+function renderPetSelectionModal() {
+  petSelectionList.innerHTML = ''; // Limpiar lista
+  if (userPets.length === 0) {
+    petSelectionList.innerHTML = '<p>No tienes mascotas registradas.</p>';
+    return;
+  }
+
+  // Filtrar las mascotas que NO han sido etiquetadas aún
+  const availablePets = userPets.filter(pet => {
+    // Devuelve true si la mascota NO está en selectedPetTags
+    return !selectedPetTags.find(tag => tag.pet_id === pet.pet_id);
+  });
+
+  if (availablePets.length === 0) {
+    petSelectionList.innerHTML = '<p>Todas tus mascotas ya están etiquetadas.</p>';
+    return;
+  }
+
+  availablePets.forEach(pet => {
+    const petItem = document.createElement('div');
+    petItem.className = 'pet-selection-item';
+    petItem.dataset.petId = pet.pet_id; // Guardamos el ID
+
+    const petImage = pet.profile_picture_url || 'https://via.placeholder.com/40';
+    petItem.innerHTML = `
+      <img src="${petImage}" alt="${pet.name}">
+      <span>${pet.name}</span>
+    `;
+    petSelectionList.appendChild(petItem);
+  });
+}
+
+// 4. Listener para seleccionar una mascota del modal
+petSelectionList.addEventListener('click', (e) => {
+  const petItem = e.target.closest('.pet-selection-item');
+  if (!petItem) return;
+
+  const petId = petItem.dataset.petId;
+  // Encontrar el objeto completo de la mascota
+  const pet = userPets.find(p => p.pet_id === petId);
+
+  if (pet) {
+    selectedPetTags.push(pet); // Añadir al array de estado
+    renderSelectedPetTags(); // Actualizar las "píldoras"
+    petSelectionModal.style.display = 'none'; // Cerrar modal
+  }
+});
+
+// 5. Función para renderizar las "píldoras" de etiquetas seleccionadas
+function renderSelectedPetTags() {
+  petTagsContainer.innerHTML = ''; // Limpiar
+  selectedPetTags.forEach(pet => {
+    const tagPill = document.createElement('span');
+    tagPill.className = 'pet-tag-pill';
+    tagPill.innerHTML = `
+      ${pet.name}
+      <button type="button" class="pet-tag-remove-btn" data-pet-id="${pet.pet_id}">×</button>
+    `;
+    petTagsContainer.appendChild(tagPill);
+  });
+}
+
+// 6. Listener para quitar una etiqueta (clic en la "X")
+petTagsContainer.addEventListener('click', (e) => {
+  const removeButton = e.target.closest('.pet-tag-remove-btn');
+  if (!removeButton) return;
+
+  const petId = removeButton.dataset.petId;
+
+  // Quitar la mascota del array de estado
+  selectedPetTags = selectedPetTags.filter(pet => pet.pet_id !== petId);
+
+  // Volver a renderizar las "píldoras"
+  renderSelectedPetTags();
 });
