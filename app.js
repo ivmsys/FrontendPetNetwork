@@ -5,6 +5,7 @@ const API_URL = 'https://petnet-tuyr.onrender.com';
 let userPets = []; // Guardará la lista de mascotas del usuario
 let selectedPetTags = []; // Guardará las mascotas seleccionadas para un post
 let selectedPostFiles = []; // Guardará los archivos de media seleccionados
+let currentNotifications = []; // Guardará las notificaciones cargadas
 // --- 2. ELEMENTOS DEL DOM ---
 // Vistas (pantallas)
 const loginView = document.getElementById('login-view');
@@ -29,7 +30,6 @@ const createPostForm = document.getElementById('create-post-form');
 const postError = document.getElementById('post-error');
 const profileView = document.getElementById('profile-view');
 const showProfileLink = document.getElementById('show-profile-link');
-//const backToFeedLink = document.getElementById('back-to-feed-link');
 const userInfoContainer = document.getElementById('user-info-container');
 const petListContainer = document.getElementById('pet-list-container');
 const registerPetForm = document.getElementById('register-pet-form');
@@ -44,6 +44,10 @@ const postMediaInput = document.getElementById('post-media-input');
 const postMediaPreviewContainer = document.getElementById('post-media-preview-container');
 const searchView = document.getElementById('search-view');
 const searchResultsContainer = document.getElementById('search-results-container');
+const notificationBell = document.getElementById('notification-bell');
+const notificationCountBadge = document.getElementById('notification-count');
+const notificationDropdown = document.getElementById('notification-dropdown');
+const notificationList = document.getElementById('notification-list');
 // --- 3. NAVEGACIÓN ENTRE VISTAS ---
 
 // Función para cambiar de vista
@@ -260,6 +264,56 @@ async function loadUserPets() {
     console.error(error.message);
   }
 }
+// --- FUNCIÓN PARA CARGAR NOTIFICACIONES NO LEÍDAS ---
+// --- FUNCIÓN PARA CARGAR NOTIFICACIONES NO LEÍDAS (CORREGIDA) ---
+async function loadNotifications() {
+  // Encuentra TODOS los badges
+  const notificationBadges = document.querySelectorAll('#notification-count'); 
+
+  const token = localStorage.getItem('token');
+  if (!token) { // Si no hay token, ocultar todos los contadores
+      notificationBadges.forEach(badge => {
+          badge.textContent = '0';
+          badge.style.display = 'none';
+      });
+      return; 
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/api/notifications`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    // Si hay error en la petición, ocultar todos los badges
+    if (!response.ok) {
+      console.error('Error al cargar notificaciones');
+      notificationBadges.forEach(badge => badge.style.display = 'none');
+      return;
+    }
+
+    const notifications = await response.json();
+    currentNotifications = notifications;
+    const count = notifications.length;
+
+    // Actualizar TODOS los contadores
+    notificationBadges.forEach(badge => {
+        if (count > 0) {
+          badge.textContent = count;
+          badge.style.display = 'block'; // Mostrar badge
+        } else {
+          badge.textContent = '0';
+          badge.style.display = 'none'; // Ocultar si no hay
+        }
+    });
+
+    // (Guardaremos 'notifications' globalmente en el siguiente paso)
+
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    notificationBadges.forEach(badge => badge.style.display = 'none'); // Ocultar si hay error de red
+  }
+}
+
 // Event Listener para el formulario de REGISTRO
 registerForm.addEventListener('submit', async (e) => {
   e.preventDefault(); // Evita que el formulario recargue la página
@@ -326,6 +380,7 @@ loginForm.addEventListener('submit', async (e) => {
     showView('app-view');
     loadFeed();
     loadUserPets();
+    loadNotifications();
   } catch (error) {
     loginError.textContent = error.message;
   }
@@ -716,6 +771,7 @@ document.addEventListener('click', (e) => {
     e.preventDefault();
     showView('profile-view');
     loadProfilePage(); // Carga los datos del perfil
+    loadNotifications();
   }
 
   // Logo "PetNet" para volver al Feed
@@ -865,6 +921,224 @@ searchResultsContainer.addEventListener('click', async (e) => {
     button.textContent = 'Añadir Amigo'; 
   }
 });
+
+// --- LÓGICA DEL MENÚ DE NOTIFICACIONES ---
+
+// 1. Mostrar/Ocultar el menú al hacer clic en la campana
+document.addEventListener('click', (e) => {
+  const bellButton = e.target.closest('#notification-bell');
+
+  if (bellButton) { // Si se hizo clic en la campana (o dentro)
+    // Alternar la visibilidad
+    const isVisible = notificationDropdown.style.display === 'block';
+    notificationDropdown.style.display = isVisible ? 'none' : 'block';
+
+    // Si se va a mostrar, renderizar el contenido
+    if (!isVisible) {
+      renderNotificationDropdown();
+
+      // (Aquí también llamaremos a 'markNotificationsAsRead' en el futuro)
+    }
+  } else if (!e.target.closest('#notification-dropdown')) {
+    // Si se hizo clic FUERA de la campana Y FUERA del menú, ocultar el menú
+    notificationDropdown.style.display = 'none';
+  }
+});
+
+// 2. Función para renderizar el contenido del menú
+// app.js - Reemplaza renderNotificationDropdown
+function renderNotificationDropdown() {
+  notificationList.innerHTML = ''; // Limpiar lista
+
+  // Filtramos solo las no leídas para mostrar (aunque las guardamos todas en currentNotifications)
+  const unreadNotifications = currentNotifications.filter(n => !n.is_read); 
+
+  if (unreadNotifications.length === 0) {
+    notificationList.innerHTML = '<p>No hay notificaciones nuevas.</p>';
+    return;
+  }
+
+  unreadNotifications.forEach(notif => {
+    const item = document.createElement('div');
+    item.className = 'notification-item';
+    // Guardamos todos los datos necesarios en atributos data-*
+    item.dataset.notificationId = notif.notification_id;
+    item.dataset.type = notif.type;
+    item.dataset.relatedId = notif.related_entity_id; // friendship_id
+    item.dataset.senderId = notif.sender_id;
+
+    let contentHtml = '';
+    const timeAgo = formatTimeAgo(notif.created_at);
+
+    switch (notif.type) {
+      case 'friend_request':
+        contentHtml = `
+          <span class="notification-text"><strong>${notif.sender_username || 'Alguien'}</strong> te envió una solicitud.</span>
+          <div class="notification-actions">
+              <button class="notification-action-btn accept">Aceptar</button>
+              <button class="notification-action-btn reject">Rechazar</button>
+          </div>
+          <span class="notification-time">${timeAgo}</span>
+        `;
+        break;
+      // Agrega cases para 'like', 'friend_accepted', etc. aquí
+      default:
+        contentHtml = `
+          <span class="notification-text">Nueva notificación (${notif.type})</span>
+          <div class="notification-actions">
+              <button class="notification-action-btn dismiss">×</button> 
+          </div>
+          <span class="notification-time">${timeAgo}</span>
+        `;
+    }
+
+    item.innerHTML = contentHtml;
+    notificationList.appendChild(item);
+  });
+}
+
+// 3. Función auxiliar para formatear "hace X tiempo" (opcional)
+function formatTimeAgo(timestamp) {
+    const seconds = Math.floor((new Date() - new Date(timestamp)) / 1000);
+    let interval = Math.floor(seconds / 31536000);
+    if (interval > 1) return `hace ${interval} años`;
+    interval = Math.floor(seconds / 2592000);
+    if (interval > 1) return `hace ${interval} meses`;
+    interval = Math.floor(seconds / 86400);
+    if (interval > 1) return `hace ${interval} días`;
+    interval = Math.floor(seconds / 3600);
+    if (interval > 1) return `hace ${interval} horas`;
+    interval = Math.floor(seconds / 60);
+    if (interval > 1) return `hace ${interval} min`;
+    return `hace ${Math.floor(seconds)} seg`;
+}
+
+// --- LISTENER PARA ACCIONES DENTRO DEL MENÚ DE NOTIFICACIONES ---
+notificationList.addEventListener('click', async (e) => {
+  const targetButton = e.target; // El botón específico presionado
+  const notificationItem = targetButton.closest('.notification-item'); // El div de la notificación
+
+  if (!notificationItem) return; // Si no se hizo clic en un item, salir
+
+  const notificationId = notificationItem.dataset.notificationId;
+  const relatedId = notificationItem.dataset.relatedId; // friendship_id
+  const token = localStorage.getItem('token');
+
+  if (!token) return;
+
+  let actionEndpoint = '';
+  let method = 'POST';
+  let body = null;
+  let actionSuccess = false;
+
+  try {
+    if (targetButton.classList.contains('accept')) {
+      actionEndpoint = `${API_URL}/api/friendships/${relatedId}/accept`;
+    } else if (targetButton.classList.contains('reject')) {
+      actionEndpoint = `${API_URL}/api/friendships/${relatedId}/reject`;
+    } else if (targetButton.classList.contains('dismiss')) {
+      actionEndpoint = `${API_URL}/api/notifications/read`;
+      body = JSON.stringify({ notificationIds: [notificationId] });
+    } else {
+      return; // No se hizo clic en un botón de acción
+    }
+
+    // Deshabilitar botones mientras se procesa
+    notificationItem.querySelectorAll('.notification-action-btn').forEach(btn => btn.disabled = true);
+
+    const response = await fetch(actionEndpoint, {
+      method: method,
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        // Añadir Content-Type solo si hay body
+        ...(body && {'Content-Type': 'application/json'}) 
+      },
+      body: body 
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Error al procesar la acción');
+    }
+
+    actionSuccess = true; // La acción fue exitosa
+
+  } catch (error) {
+    console.error("Error en acción de notificación:", error);
+    alert(error.message); // Mostrar error al usuario
+    // Rehabilitar botones si falla
+    notificationItem.querySelectorAll('.notification-action-btn').forEach(btn => btn.disabled = false);
+  }
+
+  // Si la acción fue exitosa, quitar la notificación de la UI y recargar el conteo
+  if(actionSuccess) {
+      notificationItem.remove(); // Quita el elemento de la lista
+
+      // Actualizar el estado local (opcional pero bueno)
+      currentNotifications = currentNotifications.filter(n => n.notification_id !== notificationId);
+
+      // Volver a cargar el conteo (esto actualizará el badge si es necesario)
+      loadNotifications(); 
+
+      // Si ya no quedan items, mostrar mensaje
+      if (notificationList.children.length === 0) {
+          renderNotificationDropdown(); // Re-renderiza para mostrar "No hay notificaciones"
+      }
+  }
+});
+// 4. (En el siguiente paso añadiremos un listener para los clics DENTRO del menú)
+// --- FUNCIÓN PARA MARCAR NOTIFICACIONES COMO LEÍDAS ---
+async function markNotificationsAsRead() {
+  // Si no hay notificaciones o ya están leídas (o no hay token), no hacer nada
+  if (currentNotifications.length === 0 || !localStorage.getItem('token')) {
+    return; 
+  }
+
+  // Obtener los IDs de las notificaciones NO leídas
+  const unreadIds = currentNotifications
+    .filter(n => !n.is_read) // (Necesitaremos añadir 'is_read' al backend luego)
+    .map(n => n.notification_id);
+
+  // Si no hay IDs no leídos, salir
+  if (unreadIds.length === 0) {
+    // Opcional: Podríamos quitar el badge rojo aquí si ya no hay no leídas
+    // document.querySelectorAll('#notification-count').forEach(badge => badge.style.display = 'none');
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/api/notifications/read`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ notificationIds: unreadIds })
+    });
+
+    if (!response.ok) {
+      console.error('Error al marcar notificaciones como leídas');
+      return; // No continuar si falla
+    }
+
+    // Éxito: Actualizar el estado local y el contador
+    currentNotifications.forEach(n => {
+      if (unreadIds.includes(n.notification_id)) {
+        n.is_read = true; // Marcar como leída localmente (necesitamos añadir 'is_read' al backend)
+      }
+    });
+
+    // Ocultar TODOS los badges rojos
+    document.querySelectorAll('#notification-count').forEach(badge => {
+        badge.textContent = '0';
+        badge.style.display = 'none';
+    });
+
+  } catch (error) {
+    console.error('Error marking notifications read:', error);
+  }
+}
 // --- 5. INICIALIZACIÓN ---
 // Comprobar si ya existe un token al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
@@ -874,6 +1148,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showView('app-view');
     loadFeed();
     loadUserPets();
+    loadNotifications();
   } else {
     // Si no hay token, mostramos el login
     showView('login-view');
