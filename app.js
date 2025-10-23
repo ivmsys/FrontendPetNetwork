@@ -849,7 +849,7 @@ function renderSearchResults(users) {
   users.forEach(user => {
     const userCard = document.createElement('div');
     userCard.className = 'user-card';
-    const userImage = 'https://via.placeholder.com/50'; 
+    const userImage = user.profile_picture_url || 'https://via.placeholder.com/50';
 
     userCard.innerHTML = `
       <div style="display: flex; align-items: center; gap: 1rem;"> 
