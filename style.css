@@ -818,3 +818,57 @@ button.header-icon-button:hover {
     font-weight: bold;
     padding: 0.1rem 0.5rem; /* Más ajustado para la X */
 }
+
+/* --- Estilos de Foto de Perfil de Usuario --- */
+
+.user-profile-header {
+  display: flex;
+  align-items: center; /* Centra verticalmente */
+  gap: 1.5rem; /* Espacio entre foto y datos */
+  margin-bottom: 1rem;
+}
+
+.profile-picture-container {
+  position: relative; /* Para el botón superpuesto */
+  text-align: center;
+}
+
+#profile-picture-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%; /* Círculo */
+  object-fit: cover;
+  border: 2px solid #ddd;
+  display: block; /* Para centrar */
+  margin: 0 auto 0.5rem auto; /* Centrar y espacio abajo */
+}
+
+.change-picture-button {
+  /* Estilo similar a otros botones pero más pequeño */
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8rem;
+  background-color: #f0f2f5;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.change-picture-button:hover {
+  background-color: #e4e6eb;
+}
+
+.user-details p {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+.user-details strong { /* Quita negrita por defecto */
+    font-weight: normal;
+}
+.user-details p::before { /* Añade título con CSS */
+    font-weight: bold;
+    display: inline-block;
+    width: 110px; /* Alinea los valores */
+}
+#profile-username::before { content: "Usuario:"; }
+#profile-email::before { content: "Email:"; }
+#profile-joined::before { content: "Miembro desde:"; }

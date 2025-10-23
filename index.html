@@ -132,7 +132,19 @@
 
     <div class="profile-section" id="user-info-container">
       <h2>Mi Información</h2>
-      <p>Cargando...</p>
+      <div class="user-profile-header">
+        <div class="profile-picture-container">
+            <img id="profile-picture-img" src="https://via.placeholder.com/100" alt="Foto de perfil">
+            <button id="change-picture-btn" class="change-picture-button">Cambiar Foto</button>
+            <input type="file" id="profile-picture-input" accept="image/*" style="display: none;">
+        </div>
+        <div class="user-details">
+            <p><strong id="profile-username">Usuario:</strong></p>
+            <p><strong id="profile-email">Email:</strong></p>
+            <p><strong id="profile-joined">Miembro desde:</strong></p>
+        </div>
+      </div>
+      <p id="profile-picture-error" class="error-message"></p>
     </div>
 
     <div class="profile-section">

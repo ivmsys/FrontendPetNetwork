@@ -44,10 +44,18 @@ const postMediaInput = document.getElementById('post-media-input');
 const postMediaPreviewContainer = document.getElementById('post-media-preview-container');
 const searchView = document.getElementById('search-view');
 const searchResultsContainer = document.getElementById('search-results-container');
+const profilePictureImg = document.getElementById('profile-picture-img');
+const changePictureBtn = document.getElementById('change-picture-btn');
+const profilePictureInput = document.getElementById('profile-picture-input');
+const profilePictureError = document.getElementById('profile-picture-error');
+const profileUsername = document.getElementById('profile-username');
+const profileEmail = document.getElementById('profile-email');
+const profileJoined = document.getElementById('profile-joined');
 const notificationBell = document.getElementById('notification-bell');
 const notificationCountBadge = document.getElementById('notification-count');
 const notificationDropdown = document.getElementById('notification-dropdown');
 const notificationList = document.getElementById('notification-list');
+
 // --- 3. NAVEGACIÓN ENTRE VISTAS ---
 
 // Función para cambiar de vista
@@ -80,14 +88,6 @@ showProfileLink.addEventListener('click', (e) => {
   showView('profile-view');
   loadProfilePage(); // Carga los datos del perfil
 });
-
-/*
-backToFeedLink.addEventListener('click', (e) => {
-  e.preventDefault();
-  showView('app-view');
-  loadFeed(); // Recarga el feed por si acaso
-});
-*/
 
 // --- 4. LÓGICA DE AUTENTICACIÓN ---
 // --- FUNCIÓN PARA CARGAR EL FEED ---
@@ -200,15 +200,13 @@ async function loadProfilePage() {
     }
 
     const userData = await userResponse.json();
-    const petsData = await petsResponse.json();
+    const petsData = await petsResponse.json(); // Mover aquí para tener ambos
 
-    // 1. Renderizar la información del usuario
-    userInfoContainer.innerHTML = `
-      <h2>Mi Información</h2>
-      <p><strong>Usuario:</strong> ${userData.username}</p>
-      <p><strong>Email:</strong> ${userData.email}</p>
-      <p><strong>Miembro desde:</strong> ${new Date(userData.created_at).toLocaleDateString()}</p>
-    `;
+    profileUsername.textContent = userData.username;
+    profileEmail.textContent = userData.email;
+    profileJoined.textContent = new Date(userData.created_at).toLocaleDateString();
+    profilePictureImg.src = userData.profile_picture_url || 'https://via.placeholder.com/100'; // Mostrar foto o placeholder
+    profilePictureError.textContent = ''; // Limpiar errores
 
     // 2. Renderizar la lista de mascotas
     petListContainer.innerHTML = ''; // Limpia el contenedor
@@ -1139,6 +1137,60 @@ async function markNotificationsAsRead() {
     console.error('Error marking notifications read:', error);
   }
 }
+
+// --- LÓGICA DE CAMBIO DE FOTO DE PERFIL ---
+
+// 1. Abrir input de archivo al hacer clic en "Cambiar Foto"
+changePictureBtn.addEventListener('click', () => {
+  profilePictureInput.click();
+});
+
+// 2. Manejar la selección y subida del archivo
+profilePictureInput.addEventListener('change', async (e) => {
+  if (!e.target.files || e.target.files.length === 0) return;
+
+  const file = e.target.files[0];
+  const token = localStorage.getItem('token');
+  profilePictureError.textContent = ''; // Limpiar error
+
+  if (!token) {
+    showView('login-view');
+    return;
+  }
+
+  // Mostrar carga (opcional)
+  changePictureBtn.textContent = 'Subiendo...';
+  changePictureBtn.disabled = true;
+
+  const formData = new FormData();
+  formData.append('image', file);
+
+  try {
+    const response = await fetch(`${API_URL}/api/users/me/picture`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: formData
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Error al subir la foto');
+    }
+
+    // Éxito: Actualizar la imagen mostrada
+    profilePictureImg.src = data.user.profile_picture_url;
+
+  } catch (error) {
+    profilePictureError.textContent = error.message;
+  } finally {
+    // Restaurar botón
+    changePictureBtn.textContent = 'Cambiar Foto';
+    changePictureBtn.disabled = false;
+    profilePictureInput.value = ''; // Limpiar input
+  }
+});
+
 // --- 5. INICIALIZACIÓN ---
 // Comprobar si ya existe un token al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
