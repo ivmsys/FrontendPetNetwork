@@ -872,3 +872,53 @@ button.header-icon-button:hover {
 #profile-username::before { content: "Usuario:"; }
 #profile-email::before { content: "Email:"; }
 #profile-joined::before { content: "Miembro desde:"; }
+
+/* Estilo para la imagen en TU propio perfil (más grande) */
+#profile-view #profile-picture-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ddd;
+  display: block;
+  margin: 0 auto 0.5rem auto;
+}
+
+/* Estilo para la imagen en el PERFIL PÚBLICO (más pequeña) */
+#public-profile-view #public-profile-picture-img {
+  width: 70px;  /* <-- TAMAÑO REDUCIDO */
+  height: 70px; /* <-- TAMAÑO REDUCIDO */
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ddd;
+  display: block;
+  margin: 0 auto 0.5rem auto;
+}
+
+/* Ajustar los detalles del usuario para perfiles públicos */
+#public-profile-view .user-details {
+    display: flex; /* Permite organizar el botón */
+    flex-direction: column; /* Organiza elementos en columna */
+    align-items: flex-start; /* Alinea los items a la izquierda */
+    gap: 0.3rem; /* Espacio entre párrafos y botón */
+}
+
+/* Ajustar títulos de detalles para perfiles públicos (para que Usuario: y Miembro desde: no estén en negrita) */
+#public-profile-view .user-details strong {
+  font-weight: normal; /* Quita el negrita por defecto */
+  margin-right: 0.3rem; /* Espacio entre el label y el valor */
+}
+
+/* Estilos del botón de "Cambiar Foto" (esto es para tu perfil) */
+.change-picture-button {
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8rem;
+  background-color: #f0f2f5;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.change-picture-button:hover {
+  background-color: #e4e6eb;
+}

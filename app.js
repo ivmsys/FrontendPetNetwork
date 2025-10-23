@@ -273,15 +273,35 @@ async function loadUserPets() {
   }
 }
 // --- FUNCIÓN PARA CARGAR PERFIL PÚBLICO ---
+// app.js -> REEMPLAZA ESTA FUNCIÓN COMPLETA
+// app.js -> REEMPLAZA ESTA FUNCIÓN COMPLETA
 async function loadPublicProfilePage(userId) {
   const token = localStorage.getItem('token');
   if (!token) { showView('login-view'); return; }
 
-  // Mostrar carga mientras se obtienen datos
+  // Mostrar carga y limpiar contenedores
   showView('public-profile-view');
-  publicUserInfoContainer.innerHTML = '<h2>Perfil de Usuario</h2><p>Cargando...</p>';
-  publicPetListContainer.innerHTML = '<p>Cargando mascotas...</p>';
-  publicAddFriendBtn.style.display = 'none'; // Ocultar botón por defecto
+  const userInfoContainer = document.getElementById('public-user-info-container');
+  const petListContainer = document.getElementById('public-pet-list-container');
+  const addFriendBtn = document.getElementById('public-add-friend-btn');
+
+  // Seleccionar los elementos específicos para actualizar
+  const usernameTitle = document.getElementById('public-profile-username-title');
+  const petsTitle = document.getElementById('public-profile-username-pets');
+  const profilePic = document.getElementById('public-profile-picture-img');
+  const usernameSpan = document.getElementById('public-profile-username'); // El span para el nombre
+  const joinedSpan = document.getElementById('public-profile-joined');   // El span para la fecha
+  const friendshipStatusElement = document.getElementById('public-friendship-status');
+
+  // Mostrar carga inicial
+  if (usernameTitle) usernameTitle.textContent = 'Usuario';
+  if (petsTitle) petsTitle.textContent = 'Usuario';
+  if (profilePic) profilePic.src = 'https://via.placeholder.com/100';
+  if (usernameSpan) usernameSpan.textContent = 'Cargando...';
+  if (joinedSpan) joinedSpan.textContent = 'Cargando...';
+  if (friendshipStatusElement) friendshipStatusElement.textContent = '';
+  if (addFriendBtn) addFriendBtn.style.display = 'none';
+  petListContainer.innerHTML = '<p>Cargando mascotas...</p>';
 
   try {
     const response = await fetch(`${API_URL}/api/users/${userId}`, {
@@ -289,49 +309,58 @@ async function loadPublicProfilePage(userId) {
     });
 
     if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.message || 'Error al cargar el perfil');
+      const apiErrorData = await response.json();
+      throw new Error(apiErrorData.message || 'Error al cargar el perfil');
     }
 
     const profileData = await response.json();
-    const { user, pets } = profileData;
+    const { user: userData, pets: petsData } = profileData;
 
-    // Renderizar Info del Usuario
-    publicProfileUsernameTitle.textContent = user.username;
-    publicProfileUsernamePets.textContent = user.username; // Título sección mascotas
-    publicProfilePictureImg.src = user.profile_picture_url || 'https://via.placeholder.com/100';
-    publicProfileUsername.textContent = user.username;
-    publicProfileJoined.textContent = new Date(user.created_at).toLocaleDateString();
+    // --- Renderizar Info del Usuario ---
+    if (usernameTitle) usernameTitle.textContent = userData.username;
+    if (petsTitle) petsTitle.textContent = userData.username;
+    if (profilePic) profilePic.src = userData.profile_picture_url || 'https://via.placeholder.com/100';
+    if (usernameSpan) usernameSpan.textContent = userData.username; // Actualiza el span
+    if (joinedSpan) joinedSpan.textContent = new Date(userData.created_at).toLocaleDateString(); // Actualiza el span
 
-    // Determinar estado de amistad (necesitamos hacer otra llamada o incluirlo en la respuesta)
-    // Por ahora, asumiremos que no son amigos si llegamos aquí
-    // TODO: Cargar el estado real de amistad
-    const friendshipStatus = null; // Reemplazar con llamada a API si es necesario
+    // --- Lógica de Amistad (Usando datos de la API) ---
+    const friendshipStatus = profileData.friendshipStatus; // <-- Obtenemos el estado real
+
+    // Asegurarse de que los elementos existan antes de usarlos
+    const friendshipStatusElement = document.getElementById('public-friendship-status');
+    const addFriendBtn = document.getElementById('public-add-friend-btn'); 
+
+    if (friendshipStatusElement) friendshipStatusElement.textContent = ''; // Limpiar estado previo
+    if (addFriendBtn) addFriendBtn.style.display = 'none'; // Ocultar botón por defecto
 
     if (friendshipStatus === 'accepted') {
-        publicFriendshipStatus.textContent = 'Son amigos.';
-        publicAddFriendBtn.style.display = 'none';
+        if (friendshipStatusElement) friendshipStatusElement.textContent = 'AMIGOS';
     } else if (friendshipStatus === 'pending') {
-        publicFriendshipStatus.textContent = 'Hay una solicitud pendiente.';
-        publicAddFriendBtn.style.display = 'none';
-    } else {
-        publicFriendshipStatus.textContent = '';
-        publicAddFriendBtn.style.display = 'inline-block'; // Mostrar botón "Añadir Amigo"
-        publicAddFriendBtn.dataset.userId = user.user_id; // Guardar ID para el listener
-        publicAddFriendBtn.textContent = 'Añadir Amigo';
-        publicAddFriendBtn.disabled = false;
-         publicAddFriendBtn.classList.remove('pending');
+        if (friendshipStatusElement) friendshipStatusElement.textContent = 'Hay una solicitud pendiente.'; 
+        // TODO: Sería ideal saber quién la envió para mostrar "Solicitud enviada" o "Solicitud recibida"
+    } else if (friendshipStatus === 'rejected') {
+        if (friendshipStatusElement) friendshipStatusElement.textContent = 'Solicitud rechazada.';
+        // Podríamos mostrar el botón "Añadir Amigo" de nuevo si quisiéramos
+        if (addFriendBtn) { /* ... mostrar botón ... */ }
+    } else { // Si es null (no hay relación) o cualquier otro estado
+        if (addFriendBtn) {
+            addFriendBtn.style.display = 'inline-block';
+            addFriendBtn.dataset.userId = userData.user_id;
+            addFriendBtn.textContent = 'Añadir Amigo';
+            addFriendBtn.disabled = false;
+            addFriendBtn.classList.remove('pending');
+        }
     }
+    // --- Fin Lógica de Amistad ---
 
-
-    // Renderizar Mascotas del Usuario (solo lectura)
-    publicPetListContainer.innerHTML = '';
-    if (pets.length === 0) {
-      publicPetListContainer.innerHTML = `<p>${user.username} no tiene mascotas registradas.</p>`;
+    // --- Renderizar Mascotas del Usuario ---
+    petListContainer.innerHTML = '';
+    if (!petsData || petsData.length === 0) {
+      petListContainer.innerHTML = `<p>${userData.username} no tiene mascotas registradas.</p>`;
     } else {
-      pets.forEach(pet => {
+      petsData.forEach(pet => {
         const petCard = document.createElement('div');
-        petCard.className = 'pet-card'; // Reutilizamos clase
+        petCard.className = 'pet-card';
         const birthDate = pet.birth_date ? new Date(pet.birth_date).toLocaleDateString() : 'Desconocida';
         const petImage = pet.profile_picture_url || 'https://via.placeholder.com/100';
 
@@ -342,15 +371,17 @@ async function loadPublicProfilePage(userId) {
             <p><strong>Especie:</strong> ${pet.species || 'No especificada'}</p>
             <p><strong>Raza:</strong> ${pet.breed || 'No especificada'}</p>
             <p><strong>Nacimiento:</strong> ${birthDate}</p>
-            </div>
+          </div>
         `;
-        publicPetListContainer.appendChild(petCard);
+        petListContainer.appendChild(petCard);
       });
     }
 
   } catch (error) {
-    publicUserInfoContainer.innerHTML = `<h2>Error</h2><p class="error-message">${error.message}</p>`;
-    publicPetListContainer.innerHTML = '';
+    console.error("Error en loadPublicProfilePage:", error);
+    // Muestra error solo en la sección principal de info
+    if(userInfoContainer) userInfoContainer.innerHTML = `<h2>Error</h2><p class="error-message">${error.message}</p>`;
+    petListContainer.innerHTML = ''; // Limpia mascotas en caso de error
   }
 }
 // --- FUNCIÓN PARA CARGAR NOTIFICACIONES NO LEÍDAS (CORREGIDA) ---
