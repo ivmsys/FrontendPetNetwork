@@ -29,7 +29,7 @@ const createPostForm = document.getElementById('create-post-form');
 const postError = document.getElementById('post-error');
 const profileView = document.getElementById('profile-view');
 const showProfileLink = document.getElementById('show-profile-link');
-const backToFeedLink = document.getElementById('back-to-feed-link');
+//const backToFeedLink = document.getElementById('back-to-feed-link');
 const userInfoContainer = document.getElementById('user-info-container');
 const petListContainer = document.getElementById('pet-list-container');
 const registerPetForm = document.getElementById('register-pet-form');
@@ -42,6 +42,8 @@ const closeModalButton = document.getElementById('close-modal-button');
 const addMediaButton = document.getElementById('add-media-button');
 const postMediaInput = document.getElementById('post-media-input');
 const postMediaPreviewContainer = document.getElementById('post-media-preview-container');
+const searchView = document.getElementById('search-view');
+const searchResultsContainer = document.getElementById('search-results-container');
 // --- 3. NAVEGACIÓN ENTRE VISTAS ---
 
 // Función para cambiar de vista
@@ -75,14 +77,15 @@ showProfileLink.addEventListener('click', (e) => {
   loadProfilePage(); // Carga los datos del perfil
 });
 
+/*
 backToFeedLink.addEventListener('click', (e) => {
   e.preventDefault();
   showView('app-view');
   loadFeed(); // Recarga el feed por si acaso
 });
+*/
 
 // --- 4. LÓGICA DE AUTENTICACIÓN ---
-// --- FUNCIÓN PARA CARGAR EL FEED ---
 // --- FUNCIÓN PARA CARGAR EL FEED ---
 async function loadFeed() {
   feedContainer.innerHTML = '<p>Cargando publicaciones...</p>';
@@ -327,8 +330,7 @@ loginForm.addEventListener('submit', async (e) => {
     loginError.textContent = error.message;
   }
 });
-// Event Listener para el formulario de CREAR POST
-// Event Listener para el formulario de CREAR POST (¡ACTUALIZADO!)
+
 // Event Listener para el formulario de CREAR POST (¡ACTUALIZADO con FormData!)
 createPostForm.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -698,7 +700,100 @@ petTagsContainer.addEventListener('click', (e) => {
   renderSelectedPetTags();
 });
 
+// --- LÓGICA DE NAVEGACIÓN Y BÚSQUEDA (VERSIÓN CORREGIDA) ---
 
+// Usamos 'document.addEventListener' para escuchar clics en CUALQUIER PARTE
+document.addEventListener('click', (e) => {
+
+  // Botón de Cerrar Sesión (busca el id en el elemento o en su padre)
+  if (e.target.closest('#logout-button')) {
+    localStorage.removeItem('token'); // Borra el token
+    showView('login-view'); // Muestra la pantalla de login
+  }
+
+  // Enlace de "Mi Perfil"
+  if (e.target.closest('#show-profile-link')) {
+    e.preventDefault();
+    showView('profile-view');
+    loadProfilePage(); // Carga los datos del perfil
+  }
+
+  // Logo "PetNet" para volver al Feed
+  if (e.target.closest('#back-to-feed-from-logo')) {
+    e.preventDefault();
+    showView('app-view');
+    loadFeed();
+  }
+});
+
+// Usamos 'document.addEventListener' para escuchar envíos de formularios
+document.addEventListener('submit', async (e) => {
+
+  // Formulario de Búsqueda
+  if (e.target.closest('#search-form')) {
+    e.preventDefault();
+
+    // Encontramos el input DENTRO del formulario que se envió
+    const searchInput = e.target.querySelector('#search-input');
+    const query = searchInput.value;
+    if (!query) return;
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showView('login-view');
+      return;
+    }
+
+    // Cambiamos a la vista de búsqueda ANTES de buscar
+    showView('search-view');
+
+    // Obtenemos el contenedor DENTRO de la vista de búsqueda
+    const searchResultsContainer = document.getElementById('search-results-container'); 
+    searchResultsContainer.innerHTML = '<h2>Resultados de Búsqueda</h2><p>Buscando...</p>'; // Mostramos título y carga
+
+    try {
+      const response = await fetch(`${API_URL}/api/users/search?q=${encodeURIComponent(query)}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!response.ok) {
+        throw new Error('Error en la búsqueda');
+      }
+
+      const users = await response.json();
+      renderSearchResults(users); // Llamamos a la función que renderiza
+
+    } catch (error) {
+      searchResultsContainer.innerHTML = `<h2>Resultados de Búsqueda</h2><p class="error-message">${error.message}</p>`; // Mostramos título y error
+    }
+  }
+});
+
+// Función para renderizar los resultados de la búsqueda (DEBE ESTAR FUERA de los listeners)
+function renderSearchResults(users) {
+  const searchResultsContainer = document.getElementById('search-results-container');
+  searchResultsContainer.innerHTML = '<h2>Resultados de Búsqueda</h2>'; // Limpiar y poner título
+
+  if (users.length === 0) {
+    searchResultsContainer.innerHTML += '<p>No se encontraron usuarios.</p>';
+    return;
+  }
+
+  users.forEach(user => {
+    const userCard = document.createElement('div');
+    userCard.className = 'user-card';
+    const userImage = 'https://via.placeholder.com/50'; 
+
+    userCard.innerHTML = `
+      <img src="${userImage}" alt="Foto de ${user.username}">
+      <div class="user-card-info">
+        <h3>${user.username}</h3>
+        <p>${user.email}</p>
+      </div>
+      `;
+    searchResultsContainer.appendChild(userCard);
+  });
+}
 
 // --- 5. INICIALIZACIÓN ---
 // Comprobar si ya existe un token al cargar la página

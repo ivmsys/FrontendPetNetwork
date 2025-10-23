@@ -526,3 +526,85 @@ a {
 }
 /* Si hay 4, es un grid 2x2 */
 .post-media-container.count-4 { grid-template-columns: 1fr 1fr; }
+
+/* --- Estilos del Header Actualizados --- */
+
+.header-logo {
+  text-decoration: none;
+  flex-shrink: 0; /* Evita que el logo se encoja */
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #1877f2;
+}
+
+/* Contenedor de la barra de búsqueda */
+.header-search {
+  flex-grow: 1; /* Ocupa el espacio central */
+  max-width: 400px; /* Limita el ancho máximo */
+  margin: 0 1rem; /* Espacio a los lados */
+}
+
+#search-input {
+  width: 100%; /* Ocupa todo el espacio de su contenedor */
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background-color: #f0f2f5;
+  font-size: 0.9rem;
+}
+
+/* Contenedor de los enlaces de la derecha */
+.header-links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0; /* Evita que los enlaces se encojan */
+}
+
+.header-link {
+  color: #1877f2;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+/* --- Estilos de Resultados de Búsqueda --- */
+
+#search-results-container h2 {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+/* Tarjeta para cada resultado de usuario */
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background-color: #ffffff;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.user-card img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #f0f2f5;
+}
+
+.user-card-info h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
+}
+
+.user-card-info p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #555;
+}
