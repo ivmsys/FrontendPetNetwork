@@ -195,6 +195,44 @@
   <div id="user-cards-list"></div> </main>
 </div>
 
+<div id="public-profile-view" class="view">
+
+  <header class="app-header">
+    <a href="#" id="back-to-feed-from-logo" class="header-logo"><h1>PetNet</h1></a>
+    <form id="search-form" class="header-search"><input type="search" id="search-input" placeholder="Buscar usuarios..."></form>
+    <div class="header-links">
+      <button id="notification-bell" class="header-icon-button" title="Notificaciones">🔔<span id="notification-count" class="notification-badge" style="display: none;">0</span></button>
+      <div id="notification-dropdown" class="notification-menu" style="display: none;"></div>
+      <a href="#" id="show-profile-link" class="header-link">Mi Perfil</a> 
+      <button id="logout-button">Cerrar Sesión</button>
+    </div>
+  </header>
+
+  <main class="profile-content">
+
+    <div class="profile-section" id="public-user-info-container">
+      <h2>Perfil de <span id="public-profile-username-title">Usuario</span></h2>
+      <div class="user-profile-header">
+          <div class="profile-picture-container">
+              <img id="public-profile-picture-img" src="https://via.placeholder.com/100" alt="Foto de perfil">
+              </div>
+          <div class="user-details">
+              <p><strong id="public-profile-username">Usuario:</strong> Cargando...</p>
+              <p><strong id="public-profile-joined">Miembro desde:</strong> Cargando...</p>
+              <p id="public-friendship-status"></p> <button id="public-add-friend-btn" class="add-friend-btn" style="display: none; margin-top: 0.5rem;">Añadir Amigo</button> </div>
+      </div>
+    </div>
+
+    <div class="profile-section">
+      <h2>Mascotas de <span id="public-profile-username-pets">Usuario</span></h2>
+      <div id="public-pet-list-container">
+        <p>Este usuario no tiene mascotas registradas.</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
 <script src="app.js"></script>
 </body>
 </html>

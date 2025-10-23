@@ -56,6 +56,16 @@ const notificationCountBadge = document.getElementById('notification-count');
 const notificationDropdown = document.getElementById('notification-dropdown');
 const notificationList = document.getElementById('notification-list');
 
+const publicProfileView = document.getElementById('public-profile-view');
+const publicUserInfoContainer = document.getElementById('public-user-info-container');
+const publicPetListContainer = document.getElementById('public-pet-list-container');
+const publicProfileUsernameTitle = document.getElementById('public-profile-username-title');
+const publicProfilePictureImg = document.getElementById('public-profile-picture-img');
+const publicProfileUsername = document.getElementById('public-profile-username');
+const publicProfileJoined = document.getElementById('public-profile-joined');
+const publicFriendshipStatus = document.getElementById('public-friendship-status');
+const publicAddFriendBtn = document.getElementById('public-add-friend-btn');
+const publicProfileUsernamePets = document.getElementById('public-profile-username-pets');
 // --- 3. NAVEGACIÓN ENTRE VISTAS ---
 
 // Función para cambiar de vista
@@ -262,7 +272,87 @@ async function loadUserPets() {
     console.error(error.message);
   }
 }
-// --- FUNCIÓN PARA CARGAR NOTIFICACIONES NO LEÍDAS ---
+// --- FUNCIÓN PARA CARGAR PERFIL PÚBLICO ---
+async function loadPublicProfilePage(userId) {
+  const token = localStorage.getItem('token');
+  if (!token) { showView('login-view'); return; }
+
+  // Mostrar carga mientras se obtienen datos
+  showView('public-profile-view');
+  publicUserInfoContainer.innerHTML = '<h2>Perfil de Usuario</h2><p>Cargando...</p>';
+  publicPetListContainer.innerHTML = '<p>Cargando mascotas...</p>';
+  publicAddFriendBtn.style.display = 'none'; // Ocultar botón por defecto
+
+  try {
+    const response = await fetch(`${API_URL}/api/users/${userId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Error al cargar el perfil');
+    }
+
+    const profileData = await response.json();
+    const { user, pets } = profileData;
+
+    // Renderizar Info del Usuario
+    publicProfileUsernameTitle.textContent = user.username;
+    publicProfileUsernamePets.textContent = user.username; // Título sección mascotas
+    publicProfilePictureImg.src = user.profile_picture_url || 'https://via.placeholder.com/100';
+    publicProfileUsername.textContent = user.username;
+    publicProfileJoined.textContent = new Date(user.created_at).toLocaleDateString();
+
+    // Determinar estado de amistad (necesitamos hacer otra llamada o incluirlo en la respuesta)
+    // Por ahora, asumiremos que no son amigos si llegamos aquí
+    // TODO: Cargar el estado real de amistad
+    const friendshipStatus = null; // Reemplazar con llamada a API si es necesario
+
+    if (friendshipStatus === 'accepted') {
+        publicFriendshipStatus.textContent = 'Son amigos.';
+        publicAddFriendBtn.style.display = 'none';
+    } else if (friendshipStatus === 'pending') {
+        publicFriendshipStatus.textContent = 'Hay una solicitud pendiente.';
+        publicAddFriendBtn.style.display = 'none';
+    } else {
+        publicFriendshipStatus.textContent = '';
+        publicAddFriendBtn.style.display = 'inline-block'; // Mostrar botón "Añadir Amigo"
+        publicAddFriendBtn.dataset.userId = user.user_id; // Guardar ID para el listener
+        publicAddFriendBtn.textContent = 'Añadir Amigo';
+        publicAddFriendBtn.disabled = false;
+         publicAddFriendBtn.classList.remove('pending');
+    }
+
+
+    // Renderizar Mascotas del Usuario (solo lectura)
+    publicPetListContainer.innerHTML = '';
+    if (pets.length === 0) {
+      publicPetListContainer.innerHTML = `<p>${user.username} no tiene mascotas registradas.</p>`;
+    } else {
+      pets.forEach(pet => {
+        const petCard = document.createElement('div');
+        petCard.className = 'pet-card'; // Reutilizamos clase
+        const birthDate = pet.birth_date ? new Date(pet.birth_date).toLocaleDateString() : 'Desconocida';
+        const petImage = pet.profile_picture_url || 'https://via.placeholder.com/100';
+
+        petCard.innerHTML = `
+          <img src="${petImage}" alt="Foto de ${pet.name}">
+          <div class="pet-card-info">
+            <h3>${pet.name}</h3>
+            <p><strong>Especie:</strong> ${pet.species || 'No especificada'}</p>
+            <p><strong>Raza:</strong> ${pet.breed || 'No especificada'}</p>
+            <p><strong>Nacimiento:</strong> ${birthDate}</p>
+            </div>
+        `;
+        publicPetListContainer.appendChild(petCard);
+      });
+    }
+
+  } catch (error) {
+    publicUserInfoContainer.innerHTML = `<h2>Error</h2><p class="error-message">${error.message}</p>`;
+    publicPetListContainer.innerHTML = '';
+  }
+}
 // --- FUNCIÓN PARA CARGAR NOTIFICACIONES NO LEÍDAS (CORREGIDA) ---
 async function loadNotifications() {
   // Encuentra TODOS los badges
@@ -832,14 +922,15 @@ document.addEventListener('submit', async (e) => {
 
 // Función para renderizar los resultados de la búsqueda (DEBE ESTAR FUERA de los listeners)
 // Función para renderizar los resultados de la búsqueda (CORREGIDA)
+// app.js -> Reemplaza renderSearchResults
 function renderSearchResults(users) {
-  // Encuentra el contenedor específico para las tarjetas
-  const userCardsList = document.getElementById('user-cards-list'); 
-  const feedbackElement = document.getElementById('search-feedback'); // El elemento de feedback
+  const searchResultsContainer = document.getElementById('search-results-container');
+  const userCardsList = searchResultsContainer.querySelector('#user-cards-list');
+  const feedbackElement = searchResultsContainer.querySelector('#search-feedback');
 
-  userCardsList.innerHTML = ''; // Limpia SOLO la lista de tarjetas
-  feedbackElement.textContent = ''; // Limpia el feedback previo
-  feedbackElement.className = 'feedback-message'; // Resetea clases de feedback
+  userCardsList.innerHTML = ''; 
+  feedbackElement.textContent = '';
+  feedbackElement.className = 'feedback-message';
 
   if (users.length === 0) {
     userCardsList.innerHTML = '<p>No se encontraron usuarios.</p>';
@@ -849,75 +940,117 @@ function renderSearchResults(users) {
   users.forEach(user => {
     const userCard = document.createElement('div');
     userCard.className = 'user-card';
-    const userImage = user.profile_picture_url || 'https://via.placeholder.com/50';
+    // Usa la foto de perfil real
+    const userImage = user.profile_picture_url || 'https://via.placeholder.com/50'; 
+
+    // Determinar qué botón mostrar
+    let actionButtonHtml = '';
+    if (user.friendship_status === 'accepted') {
+      actionButtonHtml = `<button class="view-profile-btn" data-user-id="${user.user_id}">Ver Perfil</button>`;
+    } else if (user.friendship_status === 'pending') {
+        // Podríamos diferenciar si la envié yo o me la enviaron
+        actionButtonHtml = `<button class="add-friend-btn pending" data-user-id="${user.user_id}" disabled>Solicitud Pendiente</button>`;
+    } else { // 'rejected', null, o cualquier otro caso
+      actionButtonHtml = `<button class="add-friend-btn" data-user-id="${user.user_id}">Añadir Amigo</button>`;
+    }
 
     userCard.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 1rem;"> 
+      <div style="display: flex; align-items: center; gap: 1rem; cursor: pointer;" class="user-card-clickable-area" data-user-id="${user.user_id}"> 
         <img src="${userImage}" alt="Foto de ${user.username}">
         <div class="user-card-info">
           <h3>${user.username}</h3>
-          <p>${user.email}</p>
-        </div>
+          </div>
       </div>
-      <button class="add-friend-btn" data-user-id="${user.user_id}">Añadir Amigo</button> 
+      ${actionButtonHtml} 
     `;
-    // Añade la tarjeta al contenedor específico
-    userCardsList.appendChild(userCard); 
+    userCardsList.appendChild(userCard);
   });
 }
 // --- LÓGICA DE SOLICITUDES DE AMISTAD ---
 
-// Event Listener (delegado) for ALL "Add Friend" buttons
+// --- LÓGICA DE SOLICITUDES DE AMISTAD Y VER PERFIL --- (ACTUALIZADO)
 searchResultsContainer.addEventListener('click', async (e) => {
-  // Only act if an "add-friend-btn" was clicked
-  if (!e.target.classList.contains('add-friend-btn')) {
-    return;
-  }
-
-  const button = e.target;
-  const userIdToSendRequest = button.dataset.userId;
-  const feedbackElement = document.getElementById('search-feedback'); // Get feedback element
-  feedbackElement.textContent = ''; // Clear previous feedback
-  feedbackElement.className = 'feedback-message'; // Reset classes
+  const addFriendButton = e.target.closest('.add-friend-btn');
+  const viewProfileButton = e.target.closest('.view-profile-btn');
+  const clickableArea = e.target.closest('.user-card-clickable-area'); // Clic en cualquier parte de la info
 
   const token = localStorage.getItem('token');
-  if (!token) {
-    showView('login-view');
-    return;
+  if (!token) { showView('login-view'); return; }
+
+  const feedbackElement = document.getElementById('search-feedback');
+  feedbackElement.textContent = ''; 
+  feedbackElement.className = 'feedback-message'; 
+
+  // --- Acción: Ver Perfil ---
+  if (viewProfileButton || clickableArea) {
+      const userIdToView = viewProfileButton ? viewProfileButton.dataset.userId : clickableArea.dataset.userId;
+      loadPublicProfilePage(userIdToView); // Carga y muestra el perfil público
+      return; // Termina aquí si solo era ver perfil
   }
 
-  // Prevent multiple clicks
-  button.disabled = true; 
-  button.textContent = 'Enviando...';
+  // --- Acción: Añadir Amigo ---
+  if (addFriendButton) {
+      // Si el botón ya está deshabilitado, no hacer nada
+      if(addFriendButton.disabled) return; 
 
-  try {
-    const response = await fetch(`${API_URL}/api/friendships/request/${userIdToSendRequest}`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`
+      const userIdToSendRequest = addFriendButton.dataset.userId;
+
+      addFriendButton.disabled = true; 
+      addFriendButton.textContent = 'Enviando...';
+
+      try {
+        const response = await fetch(`${API_URL}/api/friendships/request/${userIdToSendRequest}`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Error al enviar la solicitud');
+
+        addFriendButton.textContent = 'Solicitud Enviada';
+        addFriendButton.classList.add('pending');
+        feedbackElement.textContent = 'Solicitud de amistad enviada.';
+        feedbackElement.classList.add('success');
+
+      } catch (error) {
+        console.error('Error sending friend request:', error);
+        feedbackElement.textContent = error.message;
+        feedbackElement.classList.add('error');
+        addFriendButton.disabled = false; 
+        addFriendButton.textContent = 'Añadir Amigo'; 
       }
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || 'Error al enviar la solicitud');
-    }
-
-    // Success! Update button and show feedback
-    button.textContent = 'Solicitud Enviada';
-    button.classList.add('pending'); // Make it look disabled/pending
-    feedbackElement.textContent = 'Solicitud de amistad enviada.';
-    feedbackElement.classList.add('success');
-
-  } catch (error) {
-    console.error('Error sending friend request:', error);
-    feedbackElement.textContent = error.message;
-    feedbackElement.classList.add('error');
-    // Re-enable button on error
-    button.disabled = false; 
-    button.textContent = 'Añadir Amigo'; 
   }
+});
+
+// Listener para el botón "Añadir Amigo" DESDE la página de perfil público
+publicAddFriendBtn.addEventListener('click', async (e) => {
+    const button = e.target;
+    const userIdToSendRequest = button.dataset.userId;
+    const token = localStorage.getItem('token');
+
+    if (!token || button.disabled) return;
+
+    button.disabled = true;
+    button.textContent = 'Enviando...';
+    publicFriendshipStatus.textContent = ''; // Limpiar estado previo
+
+    try {
+        const response = await fetch(`${API_URL}/api/friendships/request/${userIdToSendRequest}`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Error al enviar la solicitud');
+
+        button.textContent = 'Solicitud Enviada';
+        button.classList.add('pending');
+        publicFriendshipStatus.textContent = 'Solicitud de amistad enviada.';
+
+    } catch (error) {
+        console.error('Error sending friend request from profile:', error);
+        publicFriendshipStatus.textContent = `Error: ${error.message}`;
+        button.disabled = false;
+        button.textContent = 'Añadir Amigo';
+    }
 });
 
 // --- LÓGICA DEL MENÚ DE NOTIFICACIONES ---
