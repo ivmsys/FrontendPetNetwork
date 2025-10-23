@@ -39,9 +39,20 @@
   <div id="app-view" class="view">
 
   <header class="app-header">
-  <h1>PetNet</h1>
-  <div> <a href="#" id="show-profile-link" class="header-link">Mi Perfil</a> <button id="logout-button">Cerrar Sesión</button>
+
+  <a href="#" id="back-to-feed-from-logo" class="header-logo">
+    <h1>PetNet</h1>
+  </a>
+
+  <form id="search-form" class="header-search"> 
+    <input type="search" id="search-input" placeholder="Buscar usuarios...">
+  </form>
+
+  <div class="header-links">
+    <a href="#" id="show-profile-link" class="header-link">Mi Perfil</a> 
+    <button id="logout-button">Cerrar Sesión</button>
   </div>
+
 </header>
 
   <div class="create-post-container">
@@ -84,10 +95,20 @@
 </div>
 <div id="profile-view" class="view">
   <header class="app-header">
-    <h1>Mi Perfil</h1>
-    <div>
-      <a href="#" id="back-to-feed-link" class="header-link">Volver al Feed</a>
-    </div>
+
+  <a href="#" id="back-to-feed-from-logo" class="header-logo">
+    <h1>PetNet</h1>
+  </a>
+
+  <form id="search-form" class="header-search"> 
+    <input type="search" id="search-input" placeholder="Buscar usuarios...">
+  </form>
+
+  <div class="header-links">
+    <a href="#" id="show-profile-link" class="header-link">Mi Perfil</a> 
+    <button id="logout-button">Cerrar Sesión</button>
+  </div>
+
   </header>
 
   <main class="profile-content">
@@ -117,6 +138,27 @@
     </div>
 
   </main>
+</div>
+
+<div id="search-view" class="view">
+
+  <header class="app-header">
+    <a href="#" id="back-to-feed-from-logo" class="header-logo">
+      <h1>PetNet</h1>
+    </a>
+    <form id="search-form" class="header-search"> 
+      <input type="search" id="search-input" placeholder="Buscar usuarios...">
+    </form>
+    <div class="header-links">
+      <a href="#" id="show-profile-link" class="header-link">Mi Perfil</a> 
+      <button id="logout-button">Cerrar Sesión</button>
+    </div>
+  </header>
+
+  <main class="app-content" id="search-results-container">
+    <h2>Resultados de Búsqueda</h2> 
+    </main>
+
 </div>
 
 <script src="app.js"></script>
