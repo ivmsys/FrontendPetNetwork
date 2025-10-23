@@ -748,8 +748,12 @@ document.addEventListener('submit', async (e) => {
     showView('search-view');
 
     // Obtenemos el contenedor DENTRO de la vista de búsqueda
-    const searchResultsContainer = document.getElementById('search-results-container'); 
-    searchResultsContainer.innerHTML = '<h2>Resultados de Búsqueda</h2><p>Buscando...</p>'; // Mostramos título y carga
+    const searchResultsContainer = document.getElementById('search-results-container'); // Find the main container
+    const userCardsList = searchResultsContainer.querySelector('#user-cards-list'); // Find the inner list
+    const feedbackElement = searchResultsContainer.querySelector('#search-feedback'); // Find feedback p
+    userCardsList.innerHTML = '<p>Buscando...</p>'; // Show loading in the list area
+    feedbackElement.textContent = ''; // Clear feedback
+    feedbackElement.className = 'feedback-message';
 
     try {
       const response = await fetch(`${API_URL}/api/users/search?q=${encodeURIComponent(query)}`, {
@@ -763,19 +767,28 @@ document.addEventListener('submit', async (e) => {
       const users = await response.json();
       renderSearchResults(users); // Llamamos a la función que renderiza
 
+    // Corrected catch block inside search submit listener
     } catch (error) {
-      searchResultsContainer.innerHTML = `<h2>Resultados de Búsqueda</h2><p class="error-message">${error.message}</p>`; // Mostramos título y error
+      const searchResultsContainer = document.getElementById('search-results-container');
+      const userCardsList = searchResultsContainer.querySelector('#user-cards-list');
+      userCardsList.innerHTML = `<p class="error-message">${error.message}</p>`; // Show error in list area
     }
   }
 });
 
 // Función para renderizar los resultados de la búsqueda (DEBE ESTAR FUERA de los listeners)
+// Función para renderizar los resultados de la búsqueda (CORREGIDA)
 function renderSearchResults(users) {
-  const searchResultsContainer = document.getElementById('search-results-container');
-  searchResultsContainer.innerHTML = '<h2>Resultados de Búsqueda</h2>'; // Limpiar y poner título
+  // Encuentra el contenedor específico para las tarjetas
+  const userCardsList = document.getElementById('user-cards-list'); 
+  const feedbackElement = document.getElementById('search-feedback'); // El elemento de feedback
+
+  userCardsList.innerHTML = ''; // Limpia SOLO la lista de tarjetas
+  feedbackElement.textContent = ''; // Limpia el feedback previo
+  feedbackElement.className = 'feedback-message'; // Resetea clases de feedback
 
   if (users.length === 0) {
-    searchResultsContainer.innerHTML += '<p>No se encontraron usuarios.</p>';
+    userCardsList.innerHTML = '<p>No se encontraron usuarios.</p>';
     return;
   }
 
@@ -785,16 +798,73 @@ function renderSearchResults(users) {
     const userImage = 'https://via.placeholder.com/50'; 
 
     userCard.innerHTML = `
-      <img src="${userImage}" alt="Foto de ${user.username}">
-      <div class="user-card-info">
-        <h3>${user.username}</h3>
-        <p>${user.email}</p>
+      <div style="display: flex; align-items: center; gap: 1rem;"> 
+        <img src="${userImage}" alt="Foto de ${user.username}">
+        <div class="user-card-info">
+          <h3>${user.username}</h3>
+          <p>${user.email}</p>
+        </div>
       </div>
-      `;
-    searchResultsContainer.appendChild(userCard);
+      <button class="add-friend-btn" data-user-id="${user.user_id}">Añadir Amigo</button> 
+    `;
+    // Añade la tarjeta al contenedor específico
+    userCardsList.appendChild(userCard); 
   });
 }
+// --- LÓGICA DE SOLICITUDES DE AMISTAD ---
 
+// Event Listener (delegado) for ALL "Add Friend" buttons
+searchResultsContainer.addEventListener('click', async (e) => {
+  // Only act if an "add-friend-btn" was clicked
+  if (!e.target.classList.contains('add-friend-btn')) {
+    return;
+  }
+
+  const button = e.target;
+  const userIdToSendRequest = button.dataset.userId;
+  const feedbackElement = document.getElementById('search-feedback'); // Get feedback element
+  feedbackElement.textContent = ''; // Clear previous feedback
+  feedbackElement.className = 'feedback-message'; // Reset classes
+
+  const token = localStorage.getItem('token');
+  if (!token) {
+    showView('login-view');
+    return;
+  }
+
+  // Prevent multiple clicks
+  button.disabled = true; 
+  button.textContent = 'Enviando...';
+
+  try {
+    const response = await fetch(`${API_URL}/api/friendships/request/${userIdToSendRequest}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Error al enviar la solicitud');
+    }
+
+    // Success! Update button and show feedback
+    button.textContent = 'Solicitud Enviada';
+    button.classList.add('pending'); // Make it look disabled/pending
+    feedbackElement.textContent = 'Solicitud de amistad enviada.';
+    feedbackElement.classList.add('success');
+
+  } catch (error) {
+    console.error('Error sending friend request:', error);
+    feedbackElement.textContent = error.message;
+    feedbackElement.classList.add('error');
+    // Re-enable button on error
+    button.disabled = false; 
+    button.textContent = 'Añadir Amigo'; 
+  }
+});
 // --- 5. INICIALIZACIÓN ---
 // Comprobar si ya existe un token al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
