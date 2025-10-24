@@ -1,0 +1,69 @@
+/* --- Estilos del Perfil --- */
+
+.header-link {
+  color: #1877f2;
+  text-decoration: none;
+  font-weight: bold;
+  margin-right: 1rem;
+  font-size: 0.9rem;
+}
+
+.app-header div {
+  display: flex;
+  align-items: center;
+}
+
+
+
+.profile-section {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.profile-section h2 {
+  margin-top: 0;
+  color: #1877f2;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+/* --- Estilos de Foto de Perfil de Usuario --- */
+
+.user-profile-header {
+  display: flex;
+  align-items: center; /* Centra verticalmente */
+  gap: 1.5rem; /* Espacio entre foto y datos */
+  margin-bottom: 1rem;
+}
+
+.profile-picture-container {
+  position: relative; /* Para el botón superpuesto */
+  text-align: center;
+}
+
+#profile-picture-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%; /* Círculo */
+  object-fit: cover;
+  border: 2px solid #ddd;
+  display: block; /* Para centrar */
+  margin: 0 auto 0.5rem auto; /* Centrar y espacio abajo */
+}
+
+.change-picture-button {
+  /* Estilo similar a otros botones pero más pequeño */
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8rem;
+  background-color: #f0f2f5;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.change-picture-button:hover {
+  background-color: #e4e6eb;
+}

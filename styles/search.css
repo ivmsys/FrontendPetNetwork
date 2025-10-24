@@ -1,0 +1,127 @@
+/* --- Estilos del Header Actualizados --- */
+
+.header-logo {
+  text-decoration: none;
+  flex-shrink: 0; /* Evita que el logo se encoja */
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #1877f2;
+}
+
+/* Contenedor de la barra de búsqueda */
+.header-search {
+  flex-grow: 1; /* Ocupa el espacio central */
+  max-width: 400px; /* Limita el ancho máximo */
+  margin: 0 1rem; /* Espacio a los lados */
+}
+
+#search-input {
+  width: 100%; /* Ocupa todo el espacio de su contenedor */
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background-color: #f0f2f5;
+  font-size: 0.9rem;
+}
+
+/* Contenedor de los enlaces de la derecha */
+.header-links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0; /* Evita que los enlaces se encojan */
+}
+
+.header-link {
+  color: #1877f2;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+/* --- Estilos de Resultados de Búsqueda --- */
+
+#search-results-container h2 {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+/* Tarjeta para cada resultado de usuario */
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background-color: #ffffff;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.user-card img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #f0f2f5;
+}
+
+.user-card-info h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
+}
+
+.user-card-info p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* --- Styles for Add Friend Button & Feedback --- */
+
+.user-card {
+  /* Add space between user info and button */
+  justify-content: space-between; 
+}
+
+.add-friend-btn {
+  padding: 0.4rem 0.8rem;
+  background-color: #e7f3ff;
+  color: #1877f2;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap; /* Prevent button text wrapping */
+}
+
+.add-friend-btn:hover {
+  background-color: #d0e7ff;
+}
+
+.add-friend-btn.pending {
+    background-color: #f0f0f0;
+    color: #888;
+    cursor: default;
+}
+
+.feedback-message {
+    font-weight: bold;
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+.feedback-message.success {
+    color: #155724;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+}
+.feedback-message.error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+}

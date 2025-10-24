@@ -1,0 +1,227 @@
+/* --- Estilos de Notificaciones --- */
+
+button.header-icon-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem; /* Tamaño del icono */
+  cursor: pointer;
+  position: relative;
+  padding: 0; 
+  margin: 0; 
+  color: #555;
+  line-height: 1; 
+  vertical-align: middle; 
+  width: 2rem;  /* Ancho fijo (un poco más que font-size) */
+  height: 2rem; /* Alto fijo (igual al ancho para ser cuadrado) */
+  display: inline-flex; /* Permite centrar contenido */
+  align-items: center;  /* Centra el icono 🔔 verticalmente */
+  justify-content: center; /* Centra el icono 🔔 horizontalmente */
+  overflow: hidden; /* Evita que partes del icono se salgan (por si acaso) */
+}
+button.header-icon-button:hover {
+  color: #1877f2;
+} 
+
+.notification-badge {
+  position: absolute;
+  top: 0px; /* <-- AJUSTA SI ES NECESARIO */
+  right: -1px; /* Posición a la derecha */
+  background-color: red;
+  color: white;
+  border-radius: 50%; /* Círculo */
+  padding: 2px 5px; /* Tamaño del círculo */
+  font-size: 0.7rem; /* Tamaño del número */
+  font-weight: bold;
+  min-width: 18px; /* Ancho mínimo */
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* --- Estilos del Menú Desplegable de Notificaciones --- */
+
+/* Contenedor relativo para posicionar el menú */
+.header-links {
+  position: relative; /* Necesario para el posicionamiento absoluto del menú */
+}
+
+.notification-menu {
+  position: absolute;
+  top: 100%; /* Justo debajo del header */
+  right: 0; /* Alineado a la derecha */
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 350px; /* Ancho del menú */
+  max-height: 400px; /* Altura máxima antes de hacer scroll */
+  overflow-y: auto; /* Scroll si hay muchas notificaciones */
+  z-index: 20; /* Asegura que esté por encima del contenido */
+  margin-top: 0.5rem; /* Pequeño espacio desde el header */
+}
+
+.notification-header {
+  padding: 0.75rem 1rem;
+  font-weight: bold;
+  border-bottom: 1px solid #eee;
+}
+
+.notification-items {
+  padding: 0; /* Quita padding por defecto */
+}
+
+.notification-item {
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1px solid #eee;
+  cursor: pointer; /* Indica que se puede hacer clic */
+  font-size: 0.9rem;
+}
+.notification-item:last-child {
+  border-bottom: none;
+}
+.notification-item:hover {
+  background-color: #f0f2f5;
+}
+
+.notification-item span {
+  flex-grow: 1; /* El texto ocupa el espacio restante */
+}
+
+/* Estilo para el texto de 'No hay notificaciones' */
+.notification-items p {
+  padding: 1rem;
+  text-align: center;
+  color: #888;
+  font-size: 0.9rem;
+}
+
+/* --- Estilos de Acciones en Notificaciones --- */
+.notification-item {
+  /* Ajustar flexbox para alinear texto, botones y tiempo */
+  display: grid;
+  grid-template-columns: 1fr auto; /* Texto a la izq, acciones/tiempo a la der */
+  grid-template-rows: auto auto; /* Dos filas */
+  align-items: center;
+  gap: 0.25rem 0.75rem; /* Espacio vertical y horizontal */
+}
+
+.notification-text {
+  grid-column: 1 / 2; /* Ocupa la primera columna */
+  grid-row: 1 / 2;    /* Ocupa la primera fila */
+}
+
+.notification-actions {
+  grid-column: 2 / 3; /* Segunda columna */
+  grid-row: 1 / 2;    /* Primera fila */
+  display: flex;
+  gap: 0.5rem;
+}
+
+.notification-time {
+  grid-column: 1 / 3; /* Ocupa ambas columnas */
+  grid-row: 2 / 3;    /* Segunda fila */
+  font-size: 0.8rem; 
+  color: #888;
+  text-align: left; /* Alinear a la izquierda bajo el texto */
+}
+
+
+.notification-action-btn {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.notification-action-btn.accept {
+  background-color: #e7f3ff;
+  color: #1877f2;
+  border-color: #1877f2;
+}
+.notification-action-btn.accept:hover {
+  background-color: #d0e7ff;
+}
+
+.notification-action-btn.reject,
+.notification-action-btn.dismiss {
+  background-color: #f0f2f5;
+  color: #555;
+  border-color: #ddd;
+}
+.notification-action-btn.reject:hover,
+.notification-action-btn.dismiss:hover {
+  background-color: #e4e6eb;
+}
+.notification-action-btn.dismiss {
+    font-weight: bold;
+    padding: 0.1rem 0.5rem; /* Más ajustado para la X */
+}
+
+.user-details p {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+.user-details strong { /* Quita negrita por defecto */
+    font-weight: normal;
+}
+.user-details p::before { /* Añade título con CSS */
+    font-weight: bold;
+    display: inline-block;
+    width: 110px; /* Alinea los valores */
+}
+#profile-username::before { content: "Usuario:"; }
+#profile-email::before { content: "Email:"; }
+#profile-joined::before { content: "Miembro desde:"; }
+
+/* Estilo para la imagen en TU propio perfil (más grande) */
+#profile-view #profile-picture-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ddd;
+  display: block;
+  margin: 0 auto 0.5rem auto;
+}
+
+/* Estilo para la imagen en el PERFIL PÚBLICO (más pequeña) */
+#public-profile-view #public-profile-picture-img {
+  width: 70px;  /* <-- TAMAÑO REDUCIDO */
+  height: 70px; /* <-- TAMAÑO REDUCIDO */
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ddd;
+  display: block;
+  margin: 0 auto 0.5rem auto;
+}
+
+/* Ajustar los detalles del usuario para perfiles públicos */
+#public-profile-view .user-details {
+    display: flex; /* Permite organizar el botón */
+    flex-direction: column; /* Organiza elementos en columna */
+    align-items: flex-start; /* Alinea los items a la izquierda */
+    gap: 0.3rem; /* Espacio entre párrafos y botón */
+}
+
+/* Ajustar títulos de detalles para perfiles públicos (para que Usuario: y Miembro desde: no estén en negrita) */
+#public-profile-view .user-details strong {
+  font-weight: normal; /* Quita el negrita por defecto */
+  margin-right: 0.3rem; /* Espacio entre el label y el valor */
+}
+
+/* Estilos del botón de "Cambiar Foto" (esto es para tu perfil) */
+.change-picture-button {
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8rem;
+  background-color: #f0f2f5;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.change-picture-button:hover {
+  background-color: #e4e6eb;
+}
