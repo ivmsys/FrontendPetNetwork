@@ -50,11 +50,13 @@
     gap: 0.5rem;          /* Espacio entre logo/búsqueda/links */
   }
 
-  /* Ajustes del Logo en el Header */
+  /* Ajustes del Logo en el Header 
   .header-logo {
-     /* Asegúrate de que el logo no ocupe toda la línea por sí solo */
-     /* Puedes mantenerlo o ajustar si es necesario, ej: text-align: center; */
+     /* Asegúrate de que el logo no ocupe toda la línea por sí solo 
+     /* Puedes mantenerlo o ajustar si es necesario, ej: text-align: center; 
   }
+  */
+
    .app-header h1 { /* Para el h1 dentro del logo */
       font-size: 1.3rem; /* Hacer el título un poco más pequeño */
    }
