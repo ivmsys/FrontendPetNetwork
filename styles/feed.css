@@ -444,21 +444,51 @@
 /* Estilo para botón Eliminar Post*/
 .post-header { /* Nuevo contenedor para autor y botón */
     display: flex;
-    justify-content: space-between; /* Empuja el botón a la derecha */
+    margin-right: 2rem;
     align-items: flex-start; /* Alinea arriba */
     margin-bottom: 0.5rem; /* Espacio antes de etiquetas/contenido */
 }
 
+/* styles/feed.css */
+
+/* styles/feed.css - REEMPLAZA los estilos de .delete-post-btn */
+
 .delete-post-btn {
-    padding: 0.1rem 0.5rem;
-    font-size: 0.7rem;
-    background-color: #f0f2f5;
-    color: #555;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-    flex-shrink: 0; /* Evita que se encoja */
+  position: absolute;   /* Posicionamiento absoluto */
+  top: 0.75rem;       /* Ajusta la distancia desde arriba */
+  right: 0.75rem;      /* Ajusta la distancia desde la derecha */
+
+  /* Anular estilos generales de botón y definir tamaño */
+  width: 28px;         /* Ancho fijo para un cuadrado pequeño */
+  height: 28px;        /* Alto fijo igual al ancho */
+  padding: 0;          /* Sin padding interno */
+  margin: 0;           /* Sin margen externo */
+
+  /* Estilo del botón 'X' */
+  background: none;       
+  border: none;           
+  color: #888;           
+  font-size: 1.5rem;      
+  font-weight: bold;      
+  line-height: 28px;     /* Centrar la 'X' verticalmente (igual al height) */
+  text-align: center;    /* Centrar la 'X' horizontalmente */
+  cursor: pointer;
+  border-radius: 4px;     
+  z-index: 2;           
+
+  /* Para asegurar que no herede flex-grow u otros */
+  flex-shrink: 0;
+  flex-grow: 0; 
 }
+
 .delete-post-btn:hover {
-    background-color: #e4e6eb;
+  color: #d93025;         
+  background-color: #f0f2f5; 
+}
+
+/* Ajuste al contenedor del autor para dejar espacio */
+.post-header {
+    /* ... otros estilos ... */
+    /* Asegúrate de que no tenga 'justify-content: space-between;' si interfiere */
+    margin-right: 35px; /* Deja espacio a la derecha para el botón (ancho + algo de margen) */
 }

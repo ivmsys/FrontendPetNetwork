@@ -171,7 +171,8 @@ async function loadFeed() {
       let deleteButtonHtml = '';
       // Mostrar botón solo si el post es nuestro
       if (currentUserId && post.author_id === currentUserId) {
-          deleteButtonHtml = `<button class="delete-post-btn" data-post-id="${post.post_id}">Eliminar</button>`;
+      // Cambia "Eliminar" por el símbolo &times;
+          deleteButtonHtml = `<button class="delete-post-btn" data-post-id="${post.post_id}" title="Eliminar post">&times;</button>`; 
       }
       // <-- FIN AÑADIDO -->
 
