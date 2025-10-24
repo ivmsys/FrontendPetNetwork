@@ -225,3 +225,23 @@ button.header-icon-button:hover {
 .change-picture-button:hover {
   background-color: #e4e6eb;
 }
+
+@media (max-width: 600px) {
+    /* Ajustes Menú Notificaciones */
+    .notification-menu {
+        width: 95%; /* Casi todo el ancho */
+        max-width: 350px; /* Pero no más de 350px */
+        right: 2.5%; /* Centrarlo un poco */
+    }
+    .notification-item {
+        font-size: 0.8rem; /* Texto más pequeño */
+        padding: 0.5rem 0.75rem;
+        /* Ajustar grid si es necesario para botones */
+        grid-template-columns: 1fr auto; 
+        gap: 0.1rem 0.5rem; 
+    }
+    .notification-action-btn {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.5rem;
+    }
+}

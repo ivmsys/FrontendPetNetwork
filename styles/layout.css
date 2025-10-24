@@ -36,3 +36,75 @@
   padding: 1rem;
   box-sizing: border-box;
 }
+
+/* --- Estilos Responsivos --- */
+
+/* Aplica estos estilos cuando la pantalla mida 600px o menos */
+@media (max-width: 600px) {
+
+  /* Ajustes del Header */
+  .app-header {
+    padding: 0.5rem 1rem; /* Menos padding en pantallas pequeñas */
+    flex-wrap: wrap;     /* Permite que los elementos pasen a la siguiente línea */
+    justify-content: center; /* Centra los elementos cuando se envuelven */
+    gap: 0.5rem;          /* Espacio entre logo/búsqueda/links */
+  }
+
+  /* Ajustes del Logo en el Header */
+  .header-logo {
+     /* Asegúrate de que el logo no ocupe toda la línea por sí solo */
+     /* Puedes mantenerlo o ajustar si es necesario, ej: text-align: center; */
+  }
+   .app-header h1 { /* Para el h1 dentro del logo */
+      font-size: 1.3rem; /* Hacer el título un poco más pequeño */
+   }
+
+
+  /* Ajustes de la Barra de Búsqueda */
+  .header-search {
+    order: 3; /* Manda la búsqueda a la segunda línea (después del logo y links) */
+    width: 100%; /* Ocupa todo el ancho en la segunda línea */
+    max-width: none; /* Quita el límite de ancho */
+    margin: 0; /* Quita márgenes horizontales */
+  }
+  #search-input {
+      font-size: 0.8rem; /* Texto de búsqueda más pequeño */
+  }
+
+
+  /* Ajustes de los Links/Botones de la Derecha */
+  .header-links {
+      /* Asegúrate de que los links quepan bien */
+      gap: 0.5rem; /* Menos espacio entre links */
+  }
+   .header-link, #logout-button {
+      font-size: 0.8rem; /* Texto de links más pequeño */
+   }
+   #logout-button {
+       padding: 0.4rem 0.8rem; /* Botón de logout más pequeño */
+   }
+   button.header-icon-button { /* La campana */
+       font-size: 1.3rem;
+   }
+
+
+  /* Ajustes del Contenido Principal */
+  .app-content, 
+  .profile-content,
+  .create-post-container {
+    max-width: 100%; /* Ocupa todo el ancho */
+    margin-top: 110px; /* MÁS espacio para el header de dos líneas */
+    padding: 0.5rem;   /* Menos padding lateral */
+    box-sizing: border-box; /* Asegura que padding no aumente el tamaño */
+  }
+  
+  .create-post-container {
+      margin-top: 0; /* El contenedor de crear post ya no necesita margen superior extra */
+  }
+
+  /* Ajustar ancho de formularios iniciales */
+  .form-container {
+      max-width: 90%;
+      padding: 1.5rem;
+  }
+}

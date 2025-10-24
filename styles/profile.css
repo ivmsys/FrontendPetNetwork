@@ -67,3 +67,60 @@
 .change-picture-button:hover {
   background-color: #e4e6eb;
 }
+
+@media (max-width: 600px) {
+  /* Ajustes del Layout del Perfil */
+  .profile-section {
+    padding: 1rem; /* Menos padding */
+  }
+  .user-profile-header {
+    flex-direction: column; /* Apila foto y detalles */
+    align-items: center; /* Centra los elementos apilados */
+    gap: 0.5rem; /* Menos espacio */
+  }
+  .profile-picture-container {
+      margin-bottom: 0.5rem; /* Espacio bajo la foto/botón */
+  }
+
+  /* Ajustar tamaño de foto (si quieres que sea diferente en móvil) */
+  #profile-view #profile-picture-img,
+  #public-profile-view #public-profile-picture-img {
+      width: 80px; 
+      height: 80px;
+  }
+
+  .user-details {
+      text-align: center; /* Centrar texto de detalles */
+      width: 100%; /* Ocupar ancho completo */
+  }
+   .user-details p::before {
+       display: none; /* Ocultar los labels "Usuario:", etc. */
+   }
+   .user-details p {
+       margin: 0.2rem 0; /* Menos espacio vertical */
+   }
+   /* Para asegurar que el botón Add Friend se centre */
+   #public-profile-view .user-details {
+       align-items: center;
+   }
+
+
+  /* Ajustes Tarjetas de Mascota en Perfil */
+  .pet-card {
+    flex-direction: column; /* Apila foto e info */
+    align-items: center; /* Centra */
+    gap: 0.5rem;
+    padding: 0.5rem 0; /* Menos padding vertical, sin padding lateral */
+    text-align: center; /* Centrar texto de mascota */
+  }
+  .pet-card img {
+    width: 80px; /* Imagen mascota más pequeña */
+    height: 80px;
+  }
+  .pet-card-info {
+      width: 100%; /* Ocupar ancho */
+  }
+  .upload-form {
+      margin-top: 0.5rem;
+  }
+}

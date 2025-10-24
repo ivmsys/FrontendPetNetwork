@@ -383,3 +383,60 @@
   font-weight: bold;
   color: #555;
 }
+
+@media (max-width: 600px) {
+  /* ... (Estilos del header y app-content que ya pusiste) ... */
+
+  /* Ajustes para Tarjetas de Post */
+  .post-card {
+    padding: 1rem; /* Menos padding */
+    padding-bottom: 2.5rem; /* Menos espacio para el botón de like */
+    font-size: 0.9rem; /* Texto un poco más pequeño en general */
+  }
+  .post-card .post-author {
+    font-size: 1rem; /* Ajustar tamaño del autor */
+  }
+  .post-card .post-content {
+    font-size: 0.9rem; /* Ajustar tamaño del contenido */
+  }
+  .post-actions {
+      bottom: 0.75rem; /* Ajustar posición del like */
+      right: 1rem;
+  }
+  .like-button {
+      font-size: 1.1rem; /* Botón like un poco más pequeño */
+  }
+  .like-count {
+      font-size: 0.8rem; /* Contador like más pequeño */
+  }
+
+  /* Ajustar grid de media en posts */
+   .post-media-container {
+       /* Forzar una sola columna en móvil si hay 2 o 4 fotos */
+       grid-template-columns: 1fr !important; 
+       max-height: 350px; /* Limitar altura en móvil */
+   }
+   .post-media-container.count-3 .post-media-item:first-child {
+       /* Quitar el span de 2 columnas en móvil */
+       grid-column: auto; 
+       grid-row: auto;
+   }
+   .post-media-item img, .post-media-item video {
+       max-height: 350px; 
+   }
+
+  /* Ajustes Formulario Crear Post (si es necesario) */
+  #create-post-form {
+    padding: 1rem; /* Menos padding */
+  }
+  #create-post-form h3 {
+      font-size: 1.1rem;
+  }
+  #post-media-preview-container {
+      gap: 0.3rem; /* Menos espacio entre previews */
+  }
+  .media-preview-item {
+      width: 60px; /* Previews más pequeñas */
+      height: 60px;
+  }
+}

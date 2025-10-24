@@ -510,9 +510,17 @@ createPostForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   postError.textContent = '';
 
-  const content = document.getElementById('post-content').value;
+  // --- AÑADIDO: Encontrar y deshabilitar botón ---
+  const submitButton = createPostForm.querySelector('button[type="submit"]');
+  if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = 'Publicando...'; // Feedback visual
+  }
 
+  const content = document.getElementById('post-content').value;
   const token = localStorage.getItem('token');
+
+
   if (!token) {
     postError.textContent = 'Error: Debes iniciar sesión para publicar.';
     showView('login-view');
@@ -560,13 +568,25 @@ createPostForm.addEventListener('submit', async (e) => {
 
   } catch (error) {
     postError.textContent = error.message;
-  }
+  } finally {
+    // --- AÑADIDO: Rehabilitar botón (SIEMPRE) ---
+    if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Publicar'; // Restaurar texto
+    }
+  }  
 });
 
 // Event Listener para el formulario de REGISTRAR MASCOTA
 registerPetForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   petRegisterError.textContent = '';
+
+  const submitButton = registerPetForm.querySelector('button[type="submit"]');
+  if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = 'Registrando...';
+  }
 
   const token = localStorage.getItem('token');
   if (!token) {
@@ -603,6 +623,13 @@ registerPetForm.addEventListener('submit', async (e) => {
 
   } catch (error) {
     petRegisterError.textContent = error.message;
+  } finally {
+    // --- AÑADIDO: Rehabilitar botón ---
+    if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Registrar Mascota';
+    }
+    // --- FIN AÑADIDO ---
   }
 });
 

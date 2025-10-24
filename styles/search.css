@@ -125,3 +125,33 @@
     background-color: #f8d7da;
     border: 1px solid #f5c6cb;
 }
+
+@media (max-width: 600px) {
+    /* Ajustes Tarjetas de Usuario en Búsqueda */
+    .user-card {
+        flex-direction: column; /* Apila foto/info y botón */
+        align-items: center; /* Centra */
+        gap: 0.5rem;
+        text-align: center;
+    }
+    /* Ajustar el div que envuelve foto e info */
+    .user-card > div:first-child { 
+        flex-direction: column; /* Apila foto e info dentro del div */
+        text-align: center;
+    }
+    .user-card img {
+        width: 60px; /* Imagen un poco más grande */
+        height: 60px;
+    }
+    .user-card-info h3 {
+        font-size: 1rem;
+    }
+     .user-card-info p {
+        font-size: 0.8rem;
+    }
+    /* Botón ocupa ancho completo */
+    .add-friend-btn, .view-profile-btn { 
+        width: 80%;
+        margin-top: 0.5rem;
+    }
+}
