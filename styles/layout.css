@@ -1,0 +1,38 @@
+/* Lógica para mostrar/ocultar pantallas */
+.view {
+  display: none; /* Oculta todas las vistas por defecto */
+}
+
+.view.active {
+  display: block; /* Muestra solo la vista que tenga la clase 'active' */
+}
+
+.app-header {
+  position: fixed; /* Fija el header arriba */
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #ffffff;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  z-index: 10;
+}
+
+.app-content {
+  width: 100%;
+  max-width: 600px;
+  margin-top: 1rem; /* <-- CAMBIA ESTO (de 80px a 1rem) */
+  padding: 1rem;
+}
+
+.profile-content {
+  width: 100%;
+  max-width: 700px;
+  margin-top: 80px; /* Debajo del header fijo */
+  padding: 1rem;
+  box-sizing: border-box;
+}
