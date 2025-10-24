@@ -440,3 +440,25 @@
       height: 60px;
   }
 }
+
+/* Estilo para botón Eliminar Post*/
+.post-header { /* Nuevo contenedor para autor y botón */
+    display: flex;
+    justify-content: space-between; /* Empuja el botón a la derecha */
+    align-items: flex-start; /* Alinea arriba */
+    margin-bottom: 0.5rem; /* Espacio antes de etiquetas/contenido */
+}
+
+.delete-post-btn {
+    padding: 0.1rem 0.5rem;
+    font-size: 0.7rem;
+    background-color: #f0f2f5;
+    color: #555;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0; /* Evita que se encoja */
+}
+.delete-post-btn:hover {
+    background-color: #e4e6eb;
+}

@@ -124,3 +124,22 @@
       margin-top: 0.5rem;
   }
 }
+
+/* Estilo para botón Eliminar Mascota */
+.delete-pet-btn {
+  display: block; /* Ocupa su propia línea */
+  width: auto; /* Ancho ajustado al texto */
+  margin-top: 0.5rem;
+  margin-left: auto; /* Empuja a la derecha */
+  margin-right: auto; /* Centra si es block */
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8rem;
+  background-color: #f8d7da; /* Rojo claro */
+  color: #721c24; /* Rojo oscuro */
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.delete-pet-btn:hover {
+  background-color: #f5c6cb;
+}

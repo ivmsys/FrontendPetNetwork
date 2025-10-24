@@ -91,6 +91,7 @@ showLoginLink.addEventListener('click', (e) => {
 
 logoutButton.addEventListener('click', () => {
   localStorage.removeItem('token'); // Borra el token
+  localStorage.removeItem('userId');
   showView('login-view'); // Muestra la pantalla de login
 });
 showProfileLink.addEventListener('click', (e) => {
@@ -100,6 +101,7 @@ showProfileLink.addEventListener('click', (e) => {
 });
 
 // --- 4. LÓGICA DE AUTENTICACIÓN ---
+// --- FUNCIÓN PARA CARGAR EL FEED ---
 // --- FUNCIÓN PARA CARGAR EL FEED ---
 async function loadFeed() {
   feedContainer.innerHTML = '<p>Cargando publicaciones...</p>';
@@ -116,9 +118,19 @@ async function loadFeed() {
     const response = await fetch(`${API_URL}/api/posts`, { headers });
     const posts = await response.json();
 
+    // --- MANEJO DE ERROR ---
+    // (Pequeña corrección aquí: usa 'posts' o response.status para checar error, no 'data')
     if (!response.ok) {
-      throw new Error(data.message || 'Error al cargar el feed');
+        // Intenta obtener el mensaje de error de la respuesta si falla
+        let errorMessage = 'Error al cargar el feed';
+        try {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorMessage;
+        } catch (e) { /* Ignora error al parsear JSON de error */ }
+        throw new Error(errorMessage);
     }
+    // --- FIN CORRECCIÓN ---
+
 
     feedContainer.innerHTML = ''; // Limpia el contenedor
 
@@ -136,14 +148,12 @@ async function loadFeed() {
         day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit'
       });
       
-      // Añadimos la clase 'liked' o 'not-liked'
       const likedClass = post.user_has_liked ? 'liked' : 'not-liked';
 
-      // ¡NUEVO! Crear el HTML para el grid de media
       let mediaHtml = '';
       if (post.media && post.media.length > 0) {
+        // ... (Tu código para mediaHtml se queda igual) ...
         mediaHtml = `<div class="post-media-container count-${post.media.length}">`;
-
         post.media.forEach(m => {
           mediaHtml += `<div class="post-media-item">`;
           if (m.type === 'image') {
@@ -153,13 +163,22 @@ async function loadFeed() {
           }
           mediaHtml += `</div>`;
         });
-
         mediaHtml += `</div>`;
       }
 
-      // HTML para la tarjeta del post
+      // <-- AÑADIDO: Lógica para el botón de eliminar -->
+      const currentUserId = localStorage.getItem('userId'); // Obtener nuestro ID
+      let deleteButtonHtml = '';
+      // Mostrar botón solo si el post es nuestro
+      if (currentUserId && post.author_id === currentUserId) {
+          deleteButtonHtml = `<button class="delete-post-btn" data-post-id="${post.post_id}">Eliminar</button>`;
+      }
+      // <-- FIN AÑADIDO -->
+
+      // HTML para la tarjeta del post (MODIFICADO para incluir el botón)
       postElement.innerHTML = `
-        <div class="post-author">${post.author_username}</div>
+        <div class="post-header"> <div class="post-author">${post.author_username}</div>
+            ${deleteButtonHtml} </div>
 
         ${post.tagged_pets && post.tagged_pets.length > 0 ? 
           `<div class="post-pet">Etiquetando a: ${post.tagged_pets.map(pet => pet.name).join(', ')}</div>` : 
@@ -167,7 +186,9 @@ async function loadFeed() {
 
         <p class="post-content">${post.content}</p>
 
-        ${mediaHtml} <div class="post-timestamp">${postDate}</div>
+        ${mediaHtml} 
+        
+        <div class="post-timestamp">${postDate}</div>
 
         <div class="post-actions">
           <button class="like-button ${likedClass}" data-post-id="${post.post_id}">
@@ -177,7 +198,7 @@ async function loadFeed() {
         </div>
       `;
 
-    feedContainer.appendChild(postElement);
+      feedContainer.appendChild(postElement);
     });
 
   } catch (error) {
@@ -244,7 +265,9 @@ async function loadProfilePage() {
               <input type="file" name="image" required>
               <button type="submit">Subir Foto</button>
             </form>
-          </div>
+
+            <button class="delete-pet-btn" data-pet-id="${pet.pet_id}">Eliminar</button>
+            </div>
         `;
         petListContainer.appendChild(petCard);
       });
@@ -494,7 +517,15 @@ loginForm.addEventListener('submit', async (e) => {
 
     // ¡¡ÉXITO!! Guardamos el token
     localStorage.setItem('token', data.token);
-    
+    try {
+        const payloadBase64 = data.token.split('.')[1];
+        const decodedJson = atob(payloadBase64);
+        const decodedPayload = JSON.parse(decodedJson);
+        localStorage.setItem('userId', decodedPayload.user.id); // Guarda nuestro ID
+    } catch (e) {
+        console.error("Error decoding token:", e);
+        localStorage.removeItem('userId'); // Limpia si falla
+    } 
     // Mostramos la app principal
     showView('app-view');
     loadFeed();
@@ -1381,7 +1412,96 @@ profilePictureInput.addEventListener('change', async (e) => {
     profilePictureInput.value = ''; // Limpiar input
   }
 });
+// app.js -> Cerca del listener de petListContainer 'submit'
+// Event Listener (delegado) para TODOS los botones de ELIMINAR MASCOTA
+petListContainer.addEventListener('click', async (e) => {
+  if (!e.target.classList.contains('delete-pet-btn')) {
+    return; // Solo actuar si se hizo clic en el botón de eliminar
+  }
 
+  const button = e.target;
+  const petId = button.dataset.petId;
+  const petCard = button.closest('.pet-card'); // Encuentra la tarjeta padre
+  const petName = petCard.querySelector('h3').textContent; // Obtiene el nombre para confirmar
+
+  // Confirmación
+  if (!confirm(`¿Estás seguro de que quieres eliminar a ${petName}? Esta acción no se puede deshacer.`)) {
+    return; 
+  }
+
+  const token = localStorage.getItem('token');
+  if (!token) { showView('login-view'); return; }
+
+  button.disabled = true;
+  button.textContent = 'Eliminando...';
+
+  try {
+    const response = await fetch(`${API_URL}/api/pets/${petId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Error al eliminar la mascota');
+    }
+
+    // Éxito: Quitar la tarjeta de la UI
+    petCard.remove(); 
+    // Opcional: Recargar toda la página de perfil si prefieres
+    // loadProfilePage();
+
+  } catch (error) {
+    alert(error.message);
+    button.disabled = false; // Rehabilitar si falla
+    button.textContent = 'Eliminar';
+  }
+});
+
+// Event Listener (delegado) para TODOS los botones de ELIMINAR POST
+feedContainer.addEventListener('click', async (e) => {
+  // Si ya manejamos el like, salir
+  if (e.target.classList.contains('like-button')) return; 
+
+  // Solo actuar si se hizo clic en el botón de eliminar
+  if (!e.target.classList.contains('delete-post-btn')) {
+    return; 
+  }
+
+  const button = e.target;
+  const postId = button.dataset.postId;
+  const postCard = button.closest('.post-card'); 
+
+  // Confirmación
+  if (!confirm('¿Estás seguro de que quieres eliminar este post?')) {
+    return; 
+  }
+
+  const token = localStorage.getItem('token');
+  if (!token) { showView('login-view'); return; }
+
+  button.disabled = true;
+  // button.textContent = 'Eliminando...'; // Opcional
+
+  try {
+    const response = await fetch(`${API_URL}/api/posts/${postId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Error al eliminar el post');
+    }
+
+    // Éxito: Quitar la tarjeta de la UI
+    postCard.remove(); 
+
+  } catch (error) {
+    alert(error.message);
+    button.disabled = false; // Rehabilitar si falla
+  }
+});
 // --- 5. INICIALIZACIÓN ---
 // Comprobar si ya existe un token al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
