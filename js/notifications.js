@@ -134,7 +134,7 @@ function renderNotificationDropdown(activeView = document.querySelector('.view.a
   });
 }
 
-function formatTimeAgo(timestamp) {
+export function formatTimeAgo(timestamp) {
   const now = new Date();
   const past = new Date(timestamp);
   const seconds = Math.floor((now - past) / 1000);

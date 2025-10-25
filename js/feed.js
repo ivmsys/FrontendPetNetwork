@@ -1,5 +1,5 @@
 import { getPosts, createPost, likePost, deletePost, getPets, getCommentsForPost, addCommentToPost } from './api.js'; // <-- AÑADE getCommentsForPost y addCommentToPost
-import { formatTimeAgo } from './utils.js';
+import { formatTimeAgo } from './notifications.js';
 
 let userPets = [];
 let selectedPetTags = [];
@@ -19,68 +19,92 @@ let petSelectionModal;
 let petSelectionList;
 let closeModalButton;
 
+// js/feed.js
+
+// ... (imports, variables globales let feedContainer;, etc.) ...
+
 export function initFeed({ showView }) {
   showViewRef = showView;
 
+  // Asignar elementos DOM
   feedContainer = document.getElementById('feed-container');
+  console.log("Elemento feedContainer:", feedContainer); // Para depurar
   createPostForm = document.getElementById('create-post-form');
-  postError = document.getElementById('post-error');
-  addMediaButton = document.getElementById('add-media-button');
-  postMediaInput = document.getElementById('post-media-input');
-  postMediaPreviewContainer = document.getElementById('post-media-preview-container');
-  tagPetButton = document.getElementById('tag-pet-button');
-  petTagsContainer = document.getElementById('pet-tags-container');
-  petSelectionModal = document.getElementById('pet-selection-modal');
-  petSelectionList = document.getElementById('pet-selection-list');
-  closeModalButton = document.getElementById('close-modal-button');
+  // ... (asignar el resto de elementos: postError, addMediaButton, etc.) ...
 
+  // Añadir listeners a los elementos que SÍ existen siempre
   if (createPostForm) {
     createPostForm.addEventListener('submit', onCreatePostSubmit);
   }
+  // ... (listeners para addMediaButton, postMediaInput, etc.) ...
 
-  if (addMediaButton) {
-    addMediaButton.addEventListener('click', () => postMediaInput && postMediaInput.click());
+  // Añadir listeners al feedContainer SOLO SI se encontró
+  if (feedContainer) { 
+    
+    // Listener para CLICS (likes, delete post, toggle comments)
+    feedContainer.addEventListener('click', onFeedContainerClick); 
+    
+    // Listener para SUBMITS (formulario de comentarios) <-- ¡PEGADO AQUÍ!
+    feedContainer.addEventListener('submit', async (e) => {
+        // --- Manejar envío de formulario de comentario ---
+        if (e.target.classList.contains('comment-form')) {
+            e.preventDefault();
+            const form = e.target;
+            const postId = form.dataset.postId;
+            const input = form.querySelector('.comment-input');
+            const button = form.querySelector('.comment-submit-btn');
+            const content = input.value.trim();
+            const token = localStorage.getItem('token');
+
+            if (!content || !token) return;
+
+            button.disabled = true;
+
+            try {
+                const newCommentData = await addCommentToPost(postId, content, token); 
+                
+                // --- Lógica para añadir dinámicamente ---
+                const commentListContainer = document.querySelector(`#comments-${postId} .comment-list`);
+                if (commentListContainer) {
+                    const noCommentsMsg = commentListContainer.querySelector('p');
+                    if (noCommentsMsg && noCommentsMsg.textContent.includes('Sé el primero')) {
+                        commentListContainer.innerHTML = '';
+                    }
+                    
+                    const item = document.createElement('div');
+                    item.className = 'comment-item';
+                    // Asegúrate que formatTimeAgo esté disponible aquí (importado o global)
+                    const commentTime = typeof formatTimeAgo === 'function' ? formatTimeAgo(newCommentData.comment.created_at) : new Date(newCommentData.comment.created_at).toLocaleTimeString();
+                    item.innerHTML = `
+                      <span class="comment-author">${newCommentData.comment.author_username}:</span>
+                      <span class="comment-content">${newCommentData.comment.content}</span>
+                      <span class="comment-timestamp">${commentTime}</span>
+                    `;
+                    commentListContainer.appendChild(item); 
+                    
+                    // Actualizar contador visual (opcional)
+                    const toggleBtn = document.querySelector(`.toggle-comments-btn[data-post-id="${postId}"]`);
+                    const countSpan = toggleBtn?.querySelector('.comment-count-display');
+                    if(countSpan) {
+                         const currentCount = parseInt(countSpan.textContent, 10) || 0;
+                         countSpan.textContent = currentCount + 1;
+                    }
+                }
+                
+                input.value = ''; // Limpiar input
+
+            } catch (error) {
+                alert(`Error al enviar comentario: ${error.message}`);
+            } finally {
+                button.disabled = false;
+            }
+        }
+    }); // <-- FIN DEL LISTENER DE SUBMIT PEGADO
+
+  } else {
+      console.error("¡ERROR! No se encontró el elemento #feed-container."); 
   }
-
-  if (postMediaInput) {
-    postMediaInput.addEventListener('change', onPostMediaChange);
-  }
-
-  if (postMediaPreviewContainer) {
-    postMediaPreviewContainer.addEventListener('click', onRemoveMediaPreview);
-  }
-
-  if (tagPetButton) {
-    tagPetButton.addEventListener('click', () => {
-      renderPetSelectionModal();
-      if (petSelectionModal) petSelectionModal.style.display = 'flex';
-    });
-  }
-
-  if (closeModalButton && petSelectionModal) {
-    closeModalButton.addEventListener('click', () => {
-      petSelectionModal.style.display = 'none';
-    });
-
-    petSelectionModal.addEventListener('click', (e) => {
-      if (e.target === petSelectionModal) {
-        petSelectionModal.style.display = 'none';
-      }
-    });
-  }
-
-  if (petSelectionList) {
-    petSelectionList.addEventListener('click', onSelectPetFromModal);
-  }
-
-  if (petTagsContainer) {
-    petTagsContainer.addEventListener('click', onRemovePetTag);
-  }
-
-  if (feedContainer) {
-    feedContainer.addEventListener('click', onFeedContainerClick);
-  }
-}
+} // <-- FIN de initFeed
 
 export async function loadFeed() {
   if (!feedContainer) {
@@ -374,6 +398,44 @@ async function onFeedContainerClick(e) {
     }
     return;
   }
+
+  if (e.target.classList.contains('toggle-comments-btn')) {
+        console.log("Toggle comments button clicked!"); // <-- Add for debugging
+        const button = e.target;
+        const postId = button.dataset.postId;
+        const commentsSection = document.getElementById(`comments-${postId}`);
+        console.log("Found comments section:", commentsSection); // <-- Add for debugging
+
+        if (!commentsSection) {
+            console.error("Could not find comments section for post:", postId);
+            return; // Exit if the section doesn't exist
+        }
+
+        // Alternar visibilidad
+        const isVisible = commentsSection.style.display === 'block';
+        console.log("Is currently visible?", isVisible); // <-- Add for debugging
+        commentsSection.style.display = isVisible ? 'none' : 'block';
+        console.log("New display style:", commentsSection.style.display); // <-- Add for debugging
+
+        // Si se va a mostrar y no se han cargado, cargarlos
+        if (!isVisible && !commentsSection.dataset.loaded) {
+            console.log("Loading comments for post:", postId); // <-- Add for debugging
+            const commentListContainer = commentsSection.querySelector('.comment-list');
+            if(commentListContainer) commentListContainer.innerHTML = '<p>Cargando comentarios...</p>';
+            
+            try {
+                const comments = await getCommentsForPost(postId); 
+                renderComments(comments, postId); // Check if renderComments exists
+                commentsSection.dataset.loaded = 'true'; 
+                const countSpan = button.querySelector('.comment-count-display');
+                if(countSpan) countSpan.textContent = comments.length;
+
+            } catch (error) {
+                console.error("Error loading comments:", error); // <-- Add for debugging
+                if(commentListContainer) commentListContainer.innerHTML = `<p class="error-message">Error al cargar: ${error.message}</p>`;
+            }
+        }
+    }
 }
 
 // --- LÓGICA DE COMENTARIOS ---
@@ -404,100 +466,3 @@ function renderComments(comments, postId) {
     commentListContainer.appendChild(item);
   });
 }
-
-// Importar formatTimeAgo si no está ya importado globalmente
-// import { formatTimeAgo } from './utils.js'; // O donde esté
-
-// Listener delegado en el feed para botones de comentarios y formularios
-feedContainer.addEventListener('click', async (e) => {
-    // ... (el código existente para likes y delete post se queda igual) ...
-
-    // --- Manejar clic en "Comentarios" ---
-    if (e.target.classList.contains('toggle-comments-btn')) {
-        const button = e.target;
-        const postId = button.dataset.postId;
-        const commentsSection = document.getElementById(`comments-${postId}`);
-
-        if (!commentsSection) return;
-
-        // Alternar visibilidad
-        const isVisible = commentsSection.style.display === 'block';
-        commentsSection.style.display = isVisible ? 'none' : 'block';
-
-        // Si se va a mostrar y no se han cargado, cargarlos
-        if (!isVisible && !commentsSection.dataset.loaded) {
-            const commentListContainer = commentsSection.querySelector('.comment-list');
-            commentListContainer.innerHTML = '<p>Cargando comentarios...</p>';
-            try {
-                // LLAMADA A API (Necesitas crear getCommentsForPost en api.js)
-                const comments = await getCommentsForPost(postId); 
-                renderComments(comments, postId);
-                commentsSection.dataset.loaded = 'true'; // Marcar como cargado
-                // Actualizar contador visual (opcional)
-                const countSpan = button.querySelector('.comment-count-display');
-                if(countSpan) countSpan.textContent = comments.length;
-
-            } catch (error) {
-                commentListContainer.innerHTML = `<p class="error-message">Error al cargar: ${error.message}</p>`;
-            }
-        }
-    }
-});
-
-feedContainer.addEventListener('submit', async (e) => {
-    // --- Manejar envío de formulario de comentario ---
-    if (e.target.classList.contains('comment-form')) {
-        e.preventDefault();
-        const form = e.target;
-        const postId = form.dataset.postId;
-        const input = form.querySelector('.comment-input');
-        const button = form.querySelector('.comment-submit-btn');
-        const content = input.value.trim();
-        const token = localStorage.getItem('token');
-
-        if (!content || !token) return;
-
-        button.disabled = true;
-
-        try {
-            // LLAMADA A API (Necesitas crear addCommentToPost en api.js)
-            const newCommentData = await addCommentToPost(postId, content, token); 
-
-            // Añadir dinámicamente a la lista
-            const commentListContainer = document.querySelector(`#comments-${postId} .comment-list`);
-            if (commentListContainer) {
-                // Quitar mensaje de "sé el primero" si existe
-                const noCommentsMsg = commentListContainer.querySelector('p');
-                if (noCommentsMsg && noCommentsMsg.textContent.includes('Sé el primero')) {
-                    commentListContainer.innerHTML = '';
-                }
-
-                // Renderizar el nuevo comentario (reutiliza lógica si quieres)
-                const item = document.createElement('div');
-                item.className = 'comment-item';
-                const commentTime = formatTimeAgo ? formatTimeAgo(newCommentData.comment.created_at) : new Date(newCommentData.comment.created_at).toLocaleTimeString();
-                item.innerHTML = `
-                  <span class="comment-author">${newCommentData.comment.author_username}:</span>
-                  <span class="comment-content">${newCommentData.comment.content}</span>
-                  <span class="comment-timestamp">${commentTime}</span>
-                `;
-                commentListContainer.appendChild(item); // Añade al final
-
-                // Actualizar contador visual (opcional)
-                const toggleBtn = document.querySelector(`.toggle-comments-btn[data-post-id="${postId}"]`);
-                const countSpan = toggleBtn?.querySelector('.comment-count-display');
-                if(countSpan) {
-                     const currentCount = parseInt(countSpan.textContent, 10) || 0;
-                     countSpan.textContent = currentCount + 1;
-                }
-            }
-
-            input.value = ''; // Limpiar input
-
-        } catch (error) {
-            alert(`Error al enviar comentario: ${error.message}`);
-        } finally {
-            button.disabled = false;
-        }
-    }
-});
