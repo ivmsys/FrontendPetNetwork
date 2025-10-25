@@ -1,4 +1,6 @@
-// app.js
+// js/main.js
+import {registerUser, loginUser} from './api.js'; // <-- AÑADE ESTA LÍNEA
+
 // --- 1. CONFIGURACIÓN ---
 // ¡¡¡CAMBIA ESTA URL POR LA TUYA DE RENDER!!!
 const API_URL = 'https://petnet-tuyr.onrender.com';
@@ -468,21 +470,8 @@ registerForm.addEventListener('submit', async (e) => {
   const password = document.getElementById('register-password').value;
 
   try {
-    const response = await fetch(`${API_URL}/api/auth/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, email, password }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      // Si hay errores de validación (ej. email duplicado)
-      throw new Error(data.message || (data.errors ? data.errors[0].msg : 'Error al registrar'));
-    }
-
+    
+    await registerUser(username, email, password)
     // ¡Éxito!
     alert('¡Registro exitoso! Ahora puedes iniciar sesión.');
     showView('login-view'); // Muestra la pantalla de login
@@ -502,20 +491,7 @@ loginForm.addEventListener('submit', async (e) => {
   const password = document.getElementById('login-password').value;
 
   try {
-    const response = await fetch(`${API_URL}/api/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || 'Error al iniciar sesión');
-    }
-
+    const data = await loginUser(email, password);
     // ¡¡ÉXITO!! Guardamos el token
     localStorage.setItem('token', data.token);
     try {
