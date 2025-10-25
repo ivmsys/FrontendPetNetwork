@@ -239,7 +239,7 @@ async function loadProfilePage() {
     profileUsername.textContent = userData.username;
     profileEmail.textContent = userData.email;
     profileJoined.textContent = new Date(userData.created_at).toLocaleDateString();
-    profilePictureImg.src = userData.profile_picture_url || 'https://via.placeholder.com/100'; // Mostrar foto o placeholder
+    profilePictureImg.src = userData.profile_picture_url || 'https://res.cloudinary.com/dk4am2opk/image/upload/v1761374308/images_ofhhpx.jpg';
     profilePictureError.textContent = ''; // Limpiar errores
 
     // 2. Renderizar la lista de mascotas
@@ -254,7 +254,7 @@ async function loadProfilePage() {
         const birthDate = pet.birth_date ? new Date(pet.birth_date).toLocaleDateString() : 'Desconocida';
 
         // Si la mascota no tiene foto, usamos un placeholder
-        const petImage = pet.profile_picture_url || 'https://via.placeholder.com/100';
+        const petImage = pet.profile_picture_url || 'https://res.cloudinary.com/dk4am2opk/image/upload/v1761374308/images_ofhhpx.jpg';
 
         petCard.innerHTML = `
           <img src="${petImage}" alt="Foto de ${pet.name}">
@@ -322,7 +322,7 @@ async function loadPublicProfilePage(userId) {
   // Mostrar carga inicial
   if (usernameTitle) usernameTitle.textContent = 'Usuario';
   if (petsTitle) petsTitle.textContent = 'Usuario';
-  if (profilePic) profilePic.src = 'https://via.placeholder.com/100';
+  if (profilePic) profilePic.src = 'https://res.cloudinary.com/dk4am2opk/image/upload/v1761374308/images_ofhhpx.jpg';
   if (usernameSpan) usernameSpan.textContent = 'Cargando...';
   if (joinedSpan) joinedSpan.textContent = 'Cargando...';
   if (friendshipStatusElement) friendshipStatusElement.textContent = '';
@@ -345,7 +345,7 @@ async function loadPublicProfilePage(userId) {
     // --- Renderizar Info del Usuario ---
     if (usernameTitle) usernameTitle.textContent = userData.username;
     if (petsTitle) petsTitle.textContent = userData.username;
-    if (profilePic) profilePic.src = userData.profile_picture_url || 'https://via.placeholder.com/100';
+    if (profilePic) profilePic.src = userData.profile_picture_url || 'https://res.cloudinary.com/dk4am2opk/image/upload/v1761374308/images_ofhhpx.jpg';
     if (usernameSpan) usernameSpan.textContent = userData.username; // Actualiza el span
     if (joinedSpan) joinedSpan.textContent = new Date(userData.created_at).toLocaleDateString(); // Actualiza el span
 
@@ -388,7 +388,7 @@ async function loadPublicProfilePage(userId) {
         const petCard = document.createElement('div');
         petCard.className = 'pet-card';
         const birthDate = pet.birth_date ? new Date(pet.birth_date).toLocaleDateString() : 'Desconocida';
-        const petImage = pet.profile_picture_url || 'https://via.placeholder.com/100';
+        const petImage = pet.profile_picture_url || 'https://res.cloudinary.com/dk4am2opk/image/upload/v1761374308/images_ofhhpx.jpg';
 
         petCard.innerHTML = `
           <img src="${petImage}" alt="Foto de ${pet.name}">
@@ -856,7 +856,7 @@ function renderPetSelectionModal() {
     petItem.className = 'pet-selection-item';
     petItem.dataset.petId = pet.pet_id; // Guardamos el ID
 
-    const petImage = pet.profile_picture_url || 'https://via.placeholder.com/40';
+    const petImage = pet.profile_picture_url || 'https://res.cloudinary.com/dk4am2opk/image/upload/v1761374308/images_ofhhpx.jpg';
     petItem.innerHTML = `
       <img src="${petImage}" alt="${pet.name}">
       <span>${pet.name}</span>
@@ -1007,7 +1007,7 @@ function renderSearchResults(users) {
     const userCard = document.createElement('div');
     userCard.className = 'user-card';
     // Usa la foto de perfil real
-    const userImage = user.profile_picture_url || 'https://via.placeholder.com/50'; 
+    const userImage = user.profile_picture_url || 'https://res.cloudinary.com/dk4am2opk/image/upload/v1761374308/images_ofhhpx.jpg'; 
 
     // Determinar qué botón mostrar
     let actionButtonHtml = '';
