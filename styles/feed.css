@@ -492,3 +492,73 @@
     /* Asegúrate de que no tenga 'justify-content: space-between;' si interfiere */
     margin-right: 35px; /* Deja espacio a la derecha para el botón (ancho + algo de margen) */
 }
+
+/* --- Estilos de Comentarios --- */
+
+.comments-section {
+  margin-top: 1rem;
+  border-top: 1px solid #eee; /* Separador */
+  padding-top: 1rem;
+}
+
+.comment-list {
+  max-height: 200px; /* Limitar altura y añadir scroll */
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+.comment-item {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.comment-author {
+  font-weight: bold;
+  color: #333;
+  flex-shrink: 0; /* Evitar que el nombre se encoja */
+}
+
+.comment-content {
+  color: #1c1e21;
+  word-break: break-word; /* Para textos largos */
+}
+
+.comment-timestamp {
+  font-size: 0.75rem;
+  color: #888;
+  margin-left: 0.5rem; /* Pequeño espacio a la izquierda */
+  flex-shrink: 0;
+}
+
+.comment-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.comment-input {
+  flex-grow: 1; /* Ocupa el espacio restante */
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 15px; /* Bordes redondeados */
+  font-size: 0.85rem;
+}
+
+.comment-submit-btn {
+  width: auto; /* Ancho automático */
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  background-color: #e7f3ff; /* Azul claro */
+  color: #1877f2; /* Azul */
+  flex-shrink: 0; /* No encoger */
+}
+.comment-submit-btn:hover {
+    background-color: #d0e7ff;
+}
+.comment-submit-btn:disabled {
+    background-color: #f0f2f5;
+    color: #aaa;
+    cursor: default;
+}

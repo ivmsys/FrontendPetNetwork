@@ -217,3 +217,29 @@ export async function uploadProfilePicture(formData, token) {
   if (!response.ok) throw new Error(data.message || 'Error al subir la foto de perfil');
   return data;
 }
+
+export async function getCommentsForPost(postId) {
+  // No necesita token porque es público
+  const response = await fetch(`${API_URL}/api/posts/${postId}/comments`);
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Error al cargar comentarios');
+  }
+  return data; // Devuelve array de comentarios
+}
+
+export async function addCommentToPost(postId, content, token) {
+  const response = await fetch(`${API_URL}/api/posts/${postId}/comments`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ content })
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Error al añadir comentario');
+  }
+  return data; // Devuelve { message, comment }
+}

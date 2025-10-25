@@ -1,5 +1,5 @@
-// js/feed.js
-import { getPosts, createPost, likePost, deletePost, getPets } from './api.js';
+import { getPosts, createPost, likePost, deletePost, getPets, getCommentsForPost, addCommentToPost } from './api.js'; // <-- AÑADE getCommentsForPost y addCommentToPost
+import { formatTimeAgo } from './utils.js';
 
 let userPets = [];
 let selectedPetTags = [];
@@ -133,26 +133,39 @@ export async function loadFeed() {
       }
 
       postElement.innerHTML = `
-        <div class="post-header"> <div class="post-author">${post.author_username}</div>
-            ${deleteButtonHtml} </div>
+        <div class="post-header"> 
+          <div class="post-author">${post.author_username}</div>
+          ${deleteButtonHtml} 
+        </div>
 
         ${post.tagged_pets && post.tagged_pets.length > 0 ? 
-          `<div class="post-pet">Etiquetando a: ${post.tagged_pets.map(pet => pet.name).join(', ')}</div>` : 
-          ''}
+        `<div class="post-pet">Etiquetando a: ${post.tagged_pets.map(pet => pet.name).join(', ')}</div>` : 
+        ''}
 
         <p class="post-content">${post.content}</p>
 
         ${mediaHtml} 
-        
+
         <div class="post-timestamp">${postDate}</div>
 
         <div class="post-actions">
-          <button class="like-button ${likedClass}" data-post-id="${post.post_id}">
-            ❤️
-          </button>
+          <button class="like-button ${likedClass}" data-post-id="${post.post_id}">❤️</button>
           <span class="like-count">${post.like_count}</span>
+
+          <button class="toggle-comments-btn" data-post-id="${post.post_id}" style="margin-left: auto; background: none; border: none; cursor: pointer; color: #555; font-size: 0.8rem;">
+            Comentarios (<span class="comment-count-display">0</span>) 
+          </button>
+          </div>
+
+        <div class="comments-section" id="comments-${post.post_id}" style="display: none;">
+          <div class="comment-list">
+            </div>
+          <form class="comment-form" data-post-id="${post.post_id}">
+            <input type="text" class="comment-input" placeholder="Escribe un comentario..." required>
+            <button type="submit" class="comment-submit-btn">Enviar</button>
+          </form>
         </div>
-      `;
+        `;
 
       feedContainer.appendChild(postElement);
     });
@@ -362,3 +375,129 @@ async function onFeedContainerClick(e) {
     return;
   }
 }
+
+// --- LÓGICA DE COMENTARIOS ---
+
+// Función para renderizar comentarios en un post específico
+function renderComments(comments, postId) {
+  const commentListContainer = document.querySelector(`#comments-${postId} .comment-list`);
+  if (!commentListContainer) return;
+
+  commentListContainer.innerHTML = ''; // Limpiar
+
+  if (!comments || comments.length === 0) {
+    commentListContainer.innerHTML = '<p style="font-size: 0.8rem; color: #888; text-align: center;">Sé el primero en comentar.</p>';
+    return;
+  }
+
+  comments.forEach(comment => {
+    const item = document.createElement('div');
+    item.className = 'comment-item';
+    // Usamos una función auxiliar de utils.js si la tuviéramos
+    const commentTime = formatTimeAgo ? formatTimeAgo(comment.created_at) : new Date(comment.created_at).toLocaleTimeString(); 
+
+    item.innerHTML = `
+      <span class="comment-author">${comment.author_username}:</span>
+      <span class="comment-content">${comment.content}</span>
+      <span class="comment-timestamp">${commentTime}</span>
+    `;
+    commentListContainer.appendChild(item);
+  });
+}
+
+// Importar formatTimeAgo si no está ya importado globalmente
+// import { formatTimeAgo } from './utils.js'; // O donde esté
+
+// Listener delegado en el feed para botones de comentarios y formularios
+feedContainer.addEventListener('click', async (e) => {
+    // ... (el código existente para likes y delete post se queda igual) ...
+
+    // --- Manejar clic en "Comentarios" ---
+    if (e.target.classList.contains('toggle-comments-btn')) {
+        const button = e.target;
+        const postId = button.dataset.postId;
+        const commentsSection = document.getElementById(`comments-${postId}`);
+
+        if (!commentsSection) return;
+
+        // Alternar visibilidad
+        const isVisible = commentsSection.style.display === 'block';
+        commentsSection.style.display = isVisible ? 'none' : 'block';
+
+        // Si se va a mostrar y no se han cargado, cargarlos
+        if (!isVisible && !commentsSection.dataset.loaded) {
+            const commentListContainer = commentsSection.querySelector('.comment-list');
+            commentListContainer.innerHTML = '<p>Cargando comentarios...</p>';
+            try {
+                // LLAMADA A API (Necesitas crear getCommentsForPost en api.js)
+                const comments = await getCommentsForPost(postId); 
+                renderComments(comments, postId);
+                commentsSection.dataset.loaded = 'true'; // Marcar como cargado
+                // Actualizar contador visual (opcional)
+                const countSpan = button.querySelector('.comment-count-display');
+                if(countSpan) countSpan.textContent = comments.length;
+
+            } catch (error) {
+                commentListContainer.innerHTML = `<p class="error-message">Error al cargar: ${error.message}</p>`;
+            }
+        }
+    }
+});
+
+feedContainer.addEventListener('submit', async (e) => {
+    // --- Manejar envío de formulario de comentario ---
+    if (e.target.classList.contains('comment-form')) {
+        e.preventDefault();
+        const form = e.target;
+        const postId = form.dataset.postId;
+        const input = form.querySelector('.comment-input');
+        const button = form.querySelector('.comment-submit-btn');
+        const content = input.value.trim();
+        const token = localStorage.getItem('token');
+
+        if (!content || !token) return;
+
+        button.disabled = true;
+
+        try {
+            // LLAMADA A API (Necesitas crear addCommentToPost en api.js)
+            const newCommentData = await addCommentToPost(postId, content, token); 
+
+            // Añadir dinámicamente a la lista
+            const commentListContainer = document.querySelector(`#comments-${postId} .comment-list`);
+            if (commentListContainer) {
+                // Quitar mensaje de "sé el primero" si existe
+                const noCommentsMsg = commentListContainer.querySelector('p');
+                if (noCommentsMsg && noCommentsMsg.textContent.includes('Sé el primero')) {
+                    commentListContainer.innerHTML = '';
+                }
+
+                // Renderizar el nuevo comentario (reutiliza lógica si quieres)
+                const item = document.createElement('div');
+                item.className = 'comment-item';
+                const commentTime = formatTimeAgo ? formatTimeAgo(newCommentData.comment.created_at) : new Date(newCommentData.comment.created_at).toLocaleTimeString();
+                item.innerHTML = `
+                  <span class="comment-author">${newCommentData.comment.author_username}:</span>
+                  <span class="comment-content">${newCommentData.comment.content}</span>
+                  <span class="comment-timestamp">${commentTime}</span>
+                `;
+                commentListContainer.appendChild(item); // Añade al final
+
+                // Actualizar contador visual (opcional)
+                const toggleBtn = document.querySelector(`.toggle-comments-btn[data-post-id="${postId}"]`);
+                const countSpan = toggleBtn?.querySelector('.comment-count-display');
+                if(countSpan) {
+                     const currentCount = parseInt(countSpan.textContent, 10) || 0;
+                     countSpan.textContent = currentCount + 1;
+                }
+            }
+
+            input.value = ''; // Limpiar input
+
+        } catch (error) {
+            alert(`Error al enviar comentario: ${error.message}`);
+        } finally {
+            button.disabled = false;
+        }
+    }
+});
