@@ -1,5 +1,10 @@
 // js/main.js
-import {registerUser, loginUser} from './api.js'; // <-- AÑADE ESTA LÍNEA
+// import duplicado eliminado
+import { registerUser, loginUser, getPosts, createPost, likePost, deletePost, getMe, getPets, registerPet, uploadPetPicture, deletePet, searchUsers, getNotifications, markNotificationsRead as apiMarkNotificationsRead, acceptFriendship, rejectFriendship, sendFriendRequest, getUserPublicProfile, uploadProfilePicture } from './api.js';
+import { showView } from './utils.js';
+import { initSearch } from './search.js';
+import { initPublicProfile, loadPublicProfilePage } from './publicProfile.js';
+import { initNotifications, loadNotifications as moduleLoadNotifications } from './notifications.js';
 
 // --- 1. CONFIGURACIÓN ---
 // ¡¡¡CAMBIA ESTA URL POR LA TUYA DE RENDER!!!
@@ -70,15 +75,7 @@ const publicAddFriendBtn = document.getElementById('public-add-friend-btn');
 const publicProfileUsernamePets = document.getElementById('public-profile-username-pets');
 // --- 3. NAVEGACIÓN ENTRE VISTAS ---
 
-// Función para cambiar de vista
-function showView(viewId) {
-  // Oculta todas las vistas
-  document.querySelectorAll('.view').forEach(view => {
-    view.classList.remove('active');
-  });
-  // Muestra la vista deseada
-  document.getElementById(viewId).classList.add('active');
-}
+// Función showView migrada a utils.js
 
 // Event Listeners para los enlaces de navegación
 showRegisterLink.addEventListener('click', (e) => {
@@ -301,163 +298,10 @@ async function loadUserPets() {
 // --- FUNCIÓN PARA CARGAR PERFIL PÚBLICO ---
 // app.js -> REEMPLAZA ESTA FUNCIÓN COMPLETA
 // app.js -> REEMPLAZA ESTA FUNCIÓN COMPLETA
-async function loadPublicProfilePage(userId) {
-  const token = localStorage.getItem('token');
-  if (!token) { showView('login-view'); return; }
+// Perfil público: migrado a publicProfile.js (initPublicProfile).
 
-  // Mostrar carga y limpiar contenedores
-  showView('public-profile-view');
-  const userInfoContainer = document.getElementById('public-user-info-container');
-  const petListContainer = document.getElementById('public-pet-list-container');
-  const addFriendBtn = document.getElementById('public-add-friend-btn');
-
-  // Seleccionar los elementos específicos para actualizar
-  const usernameTitle = document.getElementById('public-profile-username-title');
-  const petsTitle = document.getElementById('public-profile-username-pets');
-  const profilePic = document.getElementById('public-profile-picture-img');
-  const usernameSpan = document.getElementById('public-profile-username'); // El span para el nombre
-  const joinedSpan = document.getElementById('public-profile-joined');   // El span para la fecha
-  const friendshipStatusElement = document.getElementById('public-friendship-status');
-
-  // Mostrar carga inicial
-  if (usernameTitle) usernameTitle.textContent = 'Usuario';
-  if (petsTitle) petsTitle.textContent = 'Usuario';
-  if (profilePic) profilePic.src = 'https://res.cloudinary.com/dk4am2opk/image/upload/v1761374308/images_ofhhpx.jpg';
-  if (usernameSpan) usernameSpan.textContent = 'Cargando...';
-  if (joinedSpan) joinedSpan.textContent = 'Cargando...';
-  if (friendshipStatusElement) friendshipStatusElement.textContent = '';
-  if (addFriendBtn) addFriendBtn.style.display = 'none';
-  petListContainer.innerHTML = '<p>Cargando mascotas...</p>';
-
-  try {
-    const response = await fetch(`${API_URL}/api/users/${userId}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    if (!response.ok) {
-      const apiErrorData = await response.json();
-      throw new Error(apiErrorData.message || 'Error al cargar el perfil');
-    }
-
-    const profileData = await response.json();
-    const { user: userData, pets: petsData } = profileData;
-
-    // --- Renderizar Info del Usuario ---
-    if (usernameTitle) usernameTitle.textContent = userData.username;
-    if (petsTitle) petsTitle.textContent = userData.username;
-    if (profilePic) profilePic.src = userData.profile_picture_url || 'https://res.cloudinary.com/dk4am2opk/image/upload/v1761374308/images_ofhhpx.jpg';
-    if (usernameSpan) usernameSpan.textContent = userData.username; // Actualiza el span
-    if (joinedSpan) joinedSpan.textContent = new Date(userData.created_at).toLocaleDateString(); // Actualiza el span
-
-    // --- Lógica de Amistad (Usando datos de la API) ---
-    const friendshipStatus = profileData.friendshipStatus; // <-- Obtenemos el estado real
-
-    // Asegurarse de que los elementos existan antes de usarlos
-    const friendshipStatusElement = document.getElementById('public-friendship-status');
-    const addFriendBtn = document.getElementById('public-add-friend-btn'); 
-
-    if (friendshipStatusElement) friendshipStatusElement.textContent = ''; // Limpiar estado previo
-    if (addFriendBtn) addFriendBtn.style.display = 'none'; // Ocultar botón por defecto
-
-    if (friendshipStatus === 'accepted') {
-        if (friendshipStatusElement) friendshipStatusElement.textContent = 'AMIGOS';
-    } else if (friendshipStatus === 'pending') {
-        if (friendshipStatusElement) friendshipStatusElement.textContent = 'Hay una solicitud pendiente.'; 
-        // TODO: Sería ideal saber quién la envió para mostrar "Solicitud enviada" o "Solicitud recibida"
-    } else if (friendshipStatus === 'rejected') {
-        if (friendshipStatusElement) friendshipStatusElement.textContent = 'Solicitud rechazada.';
-        // Podríamos mostrar el botón "Añadir Amigo" de nuevo si quisiéramos
-        if (addFriendBtn) { /* ... mostrar botón ... */ }
-    } else { // Si es null (no hay relación) o cualquier otro estado
-        if (addFriendBtn) {
-            addFriendBtn.style.display = 'inline-block';
-            addFriendBtn.dataset.userId = userData.user_id;
-            addFriendBtn.textContent = 'Añadir Amigo';
-            addFriendBtn.disabled = false;
-            addFriendBtn.classList.remove('pending');
-        }
-    }
-    // --- Fin Lógica de Amistad ---
-
-    // --- Renderizar Mascotas del Usuario ---
-    petListContainer.innerHTML = '';
-    if (!petsData || petsData.length === 0) {
-      petListContainer.innerHTML = `<p>${userData.username} no tiene mascotas registradas.</p>`;
-    } else {
-      petsData.forEach(pet => {
-        const petCard = document.createElement('div');
-        petCard.className = 'pet-card';
-        const birthDate = pet.birth_date ? new Date(pet.birth_date).toLocaleDateString() : 'Desconocida';
-        const petImage = pet.profile_picture_url || 'https://res.cloudinary.com/dk4am2opk/image/upload/v1761374308/images_ofhhpx.jpg';
-
-        petCard.innerHTML = `
-          <img src="${petImage}" alt="Foto de ${pet.name}">
-          <div class="pet-card-info">
-            <h3>${pet.name}</h3>
-            <p><strong>Especie:</strong> ${pet.species || 'No especificada'}</p>
-            <p><strong>Raza:</strong> ${pet.breed || 'No especificada'}</p>
-            <p><strong>Nacimiento:</strong> ${birthDate}</p>
-          </div>
-        `;
-        petListContainer.appendChild(petCard);
-      });
-    }
-
-  } catch (error) {
-    console.error("Error en loadPublicProfilePage:", error);
-    // Muestra error solo en la sección principal de info
-    if(userInfoContainer) userInfoContainer.innerHTML = `<h2>Error</h2><p class="error-message">${error.message}</p>`;
-    petListContainer.innerHTML = ''; // Limpia mascotas en caso de error
-  }
-}
 // --- FUNCIÓN PARA CARGAR NOTIFICACIONES NO LEÍDAS (CORREGIDA) ---
-async function loadNotifications() {
-  // Encuentra TODOS los badges
-  const notificationBadges = document.querySelectorAll('#notification-count'); 
-
-  const token = localStorage.getItem('token');
-  if (!token) { // Si no hay token, ocultar todos los contadores
-      notificationBadges.forEach(badge => {
-          badge.textContent = '0';
-          badge.style.display = 'none';
-      });
-      return; 
-  }
-
-  try {
-    const response = await fetch(`${API_URL}/api/notifications`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    // Si hay error en la petición, ocultar todos los badges
-    if (!response.ok) {
-      console.error('Error al cargar notificaciones');
-      notificationBadges.forEach(badge => badge.style.display = 'none');
-      return;
-    }
-
-    const notifications = await response.json();
-    currentNotifications = notifications;
-    const count = notifications.length;
-
-    // Actualizar TODOS los contadores
-    notificationBadges.forEach(badge => {
-        if (count > 0) {
-          badge.textContent = count;
-          badge.style.display = 'block'; // Mostrar badge
-        } else {
-          badge.textContent = '0';
-          badge.style.display = 'none'; // Ocultar si no hay
-        }
-    });
-
-    // (Guardaremos 'notifications' globalmente en el siguiente paso)
-
-  } catch (error) {
-    console.error('Error fetching notifications:', error);
-    notificationBadges.forEach(badge => badge.style.display = 'none'); // Ocultar si hay error de red
-  }
-}
+// Función loadNotifications migrada a notifications.js (moduleLoadNotifications).
 
 // Event Listener para el formulario de REGISTRO
 registerForm.addEventListener('submit', async (e) => {
@@ -507,7 +351,7 @@ loginForm.addEventListener('submit', async (e) => {
     showView('app-view');
     loadFeed();
     loadUserPets();
-    loadNotifications();
+    moduleLoadNotifications();
   } catch (error) {
     loginError.textContent = error.message;
   }
@@ -925,7 +769,7 @@ document.addEventListener('click', (e) => {
     e.preventDefault();
     showView('profile-view');
     loadProfilePage(); // Carga los datos del perfil
-    loadNotifications();
+    moduleLoadNotifications();
   }
 
   // Logo "PetNet" para volver al Feed
@@ -936,406 +780,31 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// Usamos 'document.addEventListener' para escuchar envíos de formularios
-document.addEventListener('submit', async (e) => {
-
-  // Formulario de Búsqueda
-  if (e.target.closest('#search-form')) {
-    e.preventDefault();
-
-    // Encontramos el input DENTRO del formulario que se envió
-    const searchInput = e.target.querySelector('#search-input');
-    const query = searchInput.value;
-    if (!query) return;
-
-    const token = localStorage.getItem('token');
-    if (!token) {
-      showView('login-view');
-      return;
-    }
-
-    // Cambiamos a la vista de búsqueda ANTES de buscar
-    showView('search-view');
-
-    // Obtenemos el contenedor DENTRO de la vista de búsqueda
-    const searchResultsContainer = document.getElementById('search-results-container'); // Find the main container
-    const userCardsList = searchResultsContainer.querySelector('#user-cards-list'); // Find the inner list
-    const feedbackElement = searchResultsContainer.querySelector('#search-feedback'); // Find feedback p
-    userCardsList.innerHTML = '<p>Buscando...</p>'; // Show loading in the list area
-    feedbackElement.textContent = ''; // Clear feedback
-    feedbackElement.className = 'feedback-message';
-
-    try {
-      const response = await fetch(`${API_URL}/api/users/search?q=${encodeURIComponent(query)}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      if (!response.ok) {
-        throw new Error('Error en la búsqueda');
-      }
-
-      const users = await response.json();
-      renderSearchResults(users); // Llamamos a la función que renderiza
-
-    // Corrected catch block inside search submit listener
-    } catch (error) {
-      const searchResultsContainer = document.getElementById('search-results-container');
-      const userCardsList = searchResultsContainer.querySelector('#user-cards-list');
-      userCardsList.innerHTML = `<p class="error-message">${error.message}</p>`; // Show error in list area
-    }
-  }
-});
+// Búsqueda: manejadores migrados a search.js (initSearch).
 
 // Función para renderizar los resultados de la búsqueda (DEBE ESTAR FUERA de los listeners)
 // Función para renderizar los resultados de la búsqueda (CORREGIDA)
 // app.js -> Reemplaza renderSearchResults
-function renderSearchResults(users) {
-  const searchResultsContainer = document.getElementById('search-results-container');
-  const userCardsList = searchResultsContainer.querySelector('#user-cards-list');
-  const feedbackElement = searchResultsContainer.querySelector('#search-feedback');
-
-  userCardsList.innerHTML = ''; 
-  feedbackElement.textContent = '';
-  feedbackElement.className = 'feedback-message';
-
-  if (users.length === 0) {
-    userCardsList.innerHTML = '<p>No se encontraron usuarios.</p>';
-    return;
-  }
-
-  users.forEach(user => {
-    const userCard = document.createElement('div');
-    userCard.className = 'user-card';
-    // Usa la foto de perfil real
-    const userImage = user.profile_picture_url || 'https://res.cloudinary.com/dk4am2opk/image/upload/v1761374308/images_ofhhpx.jpg'; 
-
-    // Determinar qué botón mostrar
-    let actionButtonHtml = '';
-    if (user.friendship_status === 'accepted') {
-      actionButtonHtml = `<button class="view-profile-btn" data-user-id="${user.user_id}">Ver Perfil</button>`;
-    } else if (user.friendship_status === 'pending') {
-        // Podríamos diferenciar si la envié yo o me la enviaron
-        actionButtonHtml = `<button class="add-friend-btn pending" data-user-id="${user.user_id}" disabled>Solicitud Pendiente</button>`;
-    } else { // 'rejected', null, o cualquier otro caso
-      actionButtonHtml = `<button class="add-friend-btn" data-user-id="${user.user_id}">Añadir Amigo</button>`;
-    }
-
-    userCard.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 1rem; cursor: pointer;" class="user-card-clickable-area" data-user-id="${user.user_id}"> 
-        <img src="${userImage}" alt="Foto de ${user.username}">
-        <div class="user-card-info">
-          <h3>${user.username}</h3>
-          </div>
-      </div>
-      ${actionButtonHtml} 
-    `;
-    userCardsList.appendChild(userCard);
-  });
-}
-// --- LÓGICA DE SOLICITUDES DE AMISTAD ---
+// Render y manejadores de búsqueda migrados a search.js.
 
 // --- LÓGICA DE SOLICITUDES DE AMISTAD Y VER PERFIL --- (ACTUALIZADO)
-searchResultsContainer.addEventListener('click', async (e) => {
-  const addFriendButton = e.target.closest('.add-friend-btn');
-  const viewProfileButton = e.target.closest('.view-profile-btn');
-  const clickableArea = e.target.closest('.user-card-clickable-area'); // Clic en cualquier parte de la info
-
-  const token = localStorage.getItem('token');
-  if (!token) { showView('login-view'); return; }
-
-  const feedbackElement = document.getElementById('search-feedback');
-  feedbackElement.textContent = ''; 
-  feedbackElement.className = 'feedback-message'; 
-
-  // --- Acción: Ver Perfil ---
-  if (viewProfileButton || clickableArea) {
-      const userIdToView = viewProfileButton ? viewProfileButton.dataset.userId : clickableArea.dataset.userId;
-      loadPublicProfilePage(userIdToView); // Carga y muestra el perfil público
-      return; // Termina aquí si solo era ver perfil
-  }
-
-  // --- Acción: Añadir Amigo ---
-  if (addFriendButton) {
-      // Si el botón ya está deshabilitado, no hacer nada
-      if(addFriendButton.disabled) return; 
-
-      const userIdToSendRequest = addFriendButton.dataset.userId;
-
-      addFriendButton.disabled = true; 
-      addFriendButton.textContent = 'Enviando...';
-
-      try {
-        const response = await fetch(`${API_URL}/api/friendships/request/${userIdToSendRequest}`, {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message || 'Error al enviar la solicitud');
-
-        addFriendButton.textContent = 'Solicitud Enviada';
-        addFriendButton.classList.add('pending');
-        feedbackElement.textContent = 'Solicitud de amistad enviada.';
-        feedbackElement.classList.add('success');
-
-      } catch (error) {
-        console.error('Error sending friend request:', error);
-        feedbackElement.textContent = error.message;
-        feedbackElement.classList.add('error');
-        addFriendButton.disabled = false; 
-        addFriendButton.textContent = 'Añadir Amigo'; 
-      }
-  }
-});
-
-// Listener para el botón "Añadir Amigo" DESDE la página de perfil público
-publicAddFriendBtn.addEventListener('click', async (e) => {
-    const button = e.target;
-    const userIdToSendRequest = button.dataset.userId;
-    const token = localStorage.getItem('token');
-
-    if (!token || button.disabled) return;
-
-    button.disabled = true;
-    button.textContent = 'Enviando...';
-    publicFriendshipStatus.textContent = ''; // Limpiar estado previo
-
-    try {
-        const response = await fetch(`${API_URL}/api/friendships/request/${userIdToSendRequest}`, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message || 'Error al enviar la solicitud');
-
-        button.textContent = 'Solicitud Enviada';
-        button.classList.add('pending');
-        publicFriendshipStatus.textContent = 'Solicitud de amistad enviada.';
-
-    } catch (error) {
-        console.error('Error sending friend request from profile:', error);
-        publicFriendshipStatus.textContent = `Error: ${error.message}`;
-        button.disabled = false;
-        button.textContent = 'Añadir Amigo';
-    }
-});
+// Envío de solicitud de amistad migrado a publicProfile.js.
 
 // --- LÓGICA DEL MENÚ DE NOTIFICACIONES ---
 
-// 1. Mostrar/Ocultar el menú al hacer clic en la campana
-document.addEventListener('click', (e) => {
-  const bellButton = e.target.closest('#notification-bell');
-
-  if (bellButton) { // Si se hizo clic en la campana (o dentro)
-    // Alternar la visibilidad
-    const isVisible = notificationDropdown.style.display === 'block';
-    notificationDropdown.style.display = isVisible ? 'none' : 'block';
-
-    // Si se va a mostrar, renderizar el contenido
-    if (!isVisible) {
-      renderNotificationDropdown();
-
-      // (Aquí también llamaremos a 'markNotificationsAsRead' en el futuro)
-    }
-  } else if (!e.target.closest('#notification-dropdown')) {
-    // Si se hizo clic FUERA de la campana Y FUERA del menú, ocultar el menú
-    notificationDropdown.style.display = 'none';
-  }
-});
+// Toggle de notificaciones migrado a notifications.js (initNotifications).
 
 // 2. Función para renderizar el contenido del menú
 // app.js - Reemplaza renderNotificationDropdown
-function renderNotificationDropdown() {
-  notificationList.innerHTML = ''; // Limpiar lista
-
-  // Filtramos solo las no leídas para mostrar (aunque las guardamos todas en currentNotifications)
-  const unreadNotifications = currentNotifications.filter(n => !n.is_read); 
-
-  if (unreadNotifications.length === 0) {
-    notificationList.innerHTML = '<p>No hay notificaciones nuevas.</p>';
-    return;
-  }
-
-  unreadNotifications.forEach(notif => {
-    const item = document.createElement('div');
-    item.className = 'notification-item';
-    // Guardamos todos los datos necesarios en atributos data-*
-    item.dataset.notificationId = notif.notification_id;
-    item.dataset.type = notif.type;
-    item.dataset.relatedId = notif.related_entity_id; // friendship_id
-    item.dataset.senderId = notif.sender_id;
-
-    let contentHtml = '';
-    const timeAgo = formatTimeAgo(notif.created_at);
-
-    switch (notif.type) {
-      case 'friend_request':
-        contentHtml = `
-          <span class="notification-text"><strong>${notif.sender_username || 'Alguien'}</strong> te envió una solicitud.</span>
-          <div class="notification-actions">
-              <button class="notification-action-btn accept">Aceptar</button>
-              <button class="notification-action-btn reject">Rechazar</button>
-          </div>
-          <span class="notification-time">${timeAgo}</span>
-        `;
-        break;
-      // Agrega cases para 'like', 'friend_accepted', etc. aquí
-      default:
-        contentHtml = `
-          <span class="notification-text">Nueva notificación (${notif.type})</span>
-          <div class="notification-actions">
-              <button class="notification-action-btn dismiss">×</button> 
-          </div>
-          <span class="notification-time">${timeAgo}</span>
-        `;
-    }
-
-    item.innerHTML = contentHtml;
-    notificationList.appendChild(item);
-  });
-}
-
+// Render del dropdown de notificaciones migrado a notifications.js.
 // 3. Función auxiliar para formatear "hace X tiempo" (opcional)
-function formatTimeAgo(timestamp) {
-    const seconds = Math.floor((new Date() - new Date(timestamp)) / 1000);
-    let interval = Math.floor(seconds / 31536000);
-    if (interval > 1) return `hace ${interval} años`;
-    interval = Math.floor(seconds / 2592000);
-    if (interval > 1) return `hace ${interval} meses`;
-    interval = Math.floor(seconds / 86400);
-    if (interval > 1) return `hace ${interval} días`;
-    interval = Math.floor(seconds / 3600);
-    if (interval > 1) return `hace ${interval} horas`;
-    interval = Math.floor(seconds / 60);
-    if (interval > 1) return `hace ${interval} min`;
-    return `hace ${Math.floor(seconds)} seg`;
-}
+// Utilidad de formato de tiempo migrada a notifications.js.
 
 // --- LISTENER PARA ACCIONES DENTRO DEL MENÚ DE NOTIFICACIONES ---
-notificationList.addEventListener('click', async (e) => {
-  const targetButton = e.target; // El botón específico presionado
-  const notificationItem = targetButton.closest('.notification-item'); // El div de la notificación
-
-  if (!notificationItem) return; // Si no se hizo clic en un item, salir
-
-  const notificationId = notificationItem.dataset.notificationId;
-  const relatedId = notificationItem.dataset.relatedId; // friendship_id
-  const token = localStorage.getItem('token');
-
-  if (!token) return;
-
-  let actionEndpoint = '';
-  let method = 'POST';
-  let body = null;
-  let actionSuccess = false;
-
-  try {
-    if (targetButton.classList.contains('accept')) {
-      actionEndpoint = `${API_URL}/api/friendships/${relatedId}/accept`;
-    } else if (targetButton.classList.contains('reject')) {
-      actionEndpoint = `${API_URL}/api/friendships/${relatedId}/reject`;
-    } else if (targetButton.classList.contains('dismiss')) {
-      actionEndpoint = `${API_URL}/api/notifications/read`;
-      body = JSON.stringify({ notificationIds: [notificationId] });
-    } else {
-      return; // No se hizo clic en un botón de acción
-    }
-
-    // Deshabilitar botones mientras se procesa
-    notificationItem.querySelectorAll('.notification-action-btn').forEach(btn => btn.disabled = true);
-
-    const response = await fetch(actionEndpoint, {
-      method: method,
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        // Añadir Content-Type solo si hay body
-        ...(body && {'Content-Type': 'application/json'}) 
-      },
-      body: body 
-    });
-
-    if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.message || 'Error al procesar la acción');
-    }
-
-    actionSuccess = true; // La acción fue exitosa
-
-  } catch (error) {
-    console.error("Error en acción de notificación:", error);
-    alert(error.message); // Mostrar error al usuario
-    // Rehabilitar botones si falla
-    notificationItem.querySelectorAll('.notification-action-btn').forEach(btn => btn.disabled = false);
-  }
-
-  // Si la acción fue exitosa, quitar la notificación de la UI y recargar el conteo
-  if(actionSuccess) {
-      notificationItem.remove(); // Quita el elemento de la lista
-
-      // Actualizar el estado local (opcional pero bueno)
-      currentNotifications = currentNotifications.filter(n => n.notification_id !== notificationId);
-
-      // Volver a cargar el conteo (esto actualizará el badge si es necesario)
-      loadNotifications(); 
-
-      // Si ya no quedan items, mostrar mensaje
-      if (notificationList.children.length === 0) {
-          renderNotificationDropdown(); // Re-renderiza para mostrar "No hay notificaciones"
-      }
-  }
-});
+// Acciones dentro del menú de notificaciones migradas a notifications.js (initNotifications).
 // 4. (En el siguiente paso añadiremos un listener para los clics DENTRO del menú)
 // --- FUNCIÓN PARA MARCAR NOTIFICACIONES COMO LEÍDAS ---
-async function markNotificationsAsRead() {
-  // Si no hay notificaciones o ya están leídas (o no hay token), no hacer nada
-  if (currentNotifications.length === 0 || !localStorage.getItem('token')) {
-    return; 
-  }
-
-  // Obtener los IDs de las notificaciones NO leídas
-  const unreadIds = currentNotifications
-    .filter(n => !n.is_read) // (Necesitaremos añadir 'is_read' al backend luego)
-    .map(n => n.notification_id);
-
-  // Si no hay IDs no leídos, salir
-  if (unreadIds.length === 0) {
-    // Opcional: Podríamos quitar el badge rojo aquí si ya no hay no leídas
-    // document.querySelectorAll('#notification-count').forEach(badge => badge.style.display = 'none');
-    return;
-  }
-
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_URL}/api/notifications/read`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ notificationIds: unreadIds })
-    });
-
-    if (!response.ok) {
-      console.error('Error al marcar notificaciones como leídas');
-      return; // No continuar si falla
-    }
-
-    // Éxito: Actualizar el estado local y el contador
-    currentNotifications.forEach(n => {
-      if (unreadIds.includes(n.notification_id)) {
-        n.is_read = true; // Marcar como leída localmente (necesitamos añadir 'is_read' al backend)
-      }
-    });
-
-    // Ocultar TODOS los badges rojos
-    document.querySelectorAll('#notification-count').forEach(badge => {
-        badge.textContent = '0';
-        badge.style.display = 'none';
-    });
-
-  } catch (error) {
-    console.error('Error marking notifications read:', error);
-  }
-}
+// Función markNotificationsAsRead migrada a notifications.js.
 
 // --- LÓGICA DE CAMBIO DE FOTO DE PERFIL ---
 
@@ -1482,15 +951,18 @@ feedContainer.addEventListener('click', async (e) => {
 // --- 5. INICIALIZACIÓN ---
 // Comprobar si ya existe un token al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
+  // Inicializar módulos (listeners y lógica propia)
+  initSearch({ showView, loadPublicProfilePage });
+  initPublicProfile({ showView });
+  initNotifications({ showView });
+
   const token = localStorage.getItem('token');
   if (token) {
-    // Si hay token, mostramos la app (luego verificaremos si es válido)
     showView('app-view');
     loadFeed();
     loadUserPets();
-    loadNotifications();
+    moduleLoadNotifications();
   } else {
-    // Si no hay token, mostramos el login
     showView('login-view');
   }
 });

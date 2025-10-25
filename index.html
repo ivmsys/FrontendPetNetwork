@@ -49,21 +49,21 @@
     <h1>PetNet</h1>
   </a>
 
-  <form id="search-form" class="header-search"> 
-    <input type="search" id="search-input" placeholder="Buscar usuarios...">
+  <form class="header-search search-form"> 
+    <input type="search" class="search-input" placeholder="Buscar usuarios...">
   </form>
 
   <div class="header-links">
 
-  <button id="notification-bell" class="header-icon-button" title="Notificaciones">
+  <button class="notification-bell header-icon-button" title="Notificaciones" aria-expanded="false">
     🔔
-    <span id="notification-count" class="notification-badge" style="display: none;">0</span> 
+    <span class="notification-count notification-badge" style="display: none;">0</span> 
   </button>
 
-  <div id="notification-dropdown" class="notification-menu" style="display: none;">
+  <div class="notification-dropdown notification-menu" style="display: none;" role="dialog" aria-hidden="true">
     <div class="notification-header">Notificaciones</div>
-    <div id="notification-list" class="notification-items">
-      <p>No hay notificaciones nuevas.</p>
+    <div class="notification-list notification-items">
+      <p>No tienes notificaciones recientes.</p>
     </div>
   </div>
   <a href="#" id="show-profile-link" class="header-link">Mi Perfil</a> 
@@ -117,16 +117,22 @@
     <h1>PetNet</h1>
   </a>
 
-  <form id="search-form" class="header-search"> 
-    <input type="search" id="search-input" placeholder="Buscar usuarios...">
+  <form class="header-search search-form"> 
+    <input type="search" class="search-input" placeholder="Buscar usuarios...">
   </form>
 
   <div class="header-links">
 
-  <button id="notification-bell" class="header-icon-button" title="Notificaciones">
-      🔔
-      <span id="notification-count" class="notification-badge" style="display: none;">0</span> 
-    </button>
+  <button class="notification-bell header-icon-button" title="Notificaciones" aria-expanded="false">
+          🔔
+          <span class="notification-count notification-badge" style="display: none;">0</span> 
+        </button>
+        <div class="notification-dropdown notification-menu" style="display: none;" role="dialog" aria-hidden="true">
+          <div class="notification-header">Notificaciones</div>
+          <div class="notification-list notification-items">
+            <p>No tienes notificaciones recientes.</p>
+          </div>
+        </div>
     <a href="#" id="show-profile-link" class="header-link">Mi Perfil</a> 
     <button id="logout-button">Cerrar Sesión</button>
   </div>
@@ -180,15 +186,21 @@
     <a href="#" id="back-to-feed-from-logo" class="header-logo">
       <h1>PetNet</h1>
     </a>
-    <form id="search-form" class="header-search"> 
-      <input type="search" id="search-input" placeholder="Buscar usuarios...">
+    <form class="header-search search-form"> 
+      <input type="search" class="search-input" placeholder="Buscar usuarios...">
     </form>
     <div class="header-links">
 
-      <button id="notification-bell" class="header-icon-button" title="Notificaciones">
+      <button class="notification-bell header-icon-button" title="Notificaciones" aria-expanded="false">
         🔔
-        <span id="notification-count" class="notification-badge" style="display: none;">0</span> 
+        <span class="notification-count notification-badge" style="display: none;">0</span> 
       </button>
+      <div class="notification-dropdown notification-menu" style="display: none;" role="dialog" aria-hidden="true">
+        <div class="notification-header">Notificaciones</div>
+        <div class="notification-list notification-items">
+          <p>No tienes notificaciones recientes.</p>
+        </div>
+      </div>
       <a href="#" id="show-profile-link" class="header-link">Mi Perfil</a> 
       <button id="logout-button">Cerrar Sesión</button>
     </div>
@@ -204,10 +216,18 @@
 
   <header class="app-header">
     <a href="#" id="back-to-feed-from-logo" class="header-logo"><h1>PetNet</h1></a>
-    <form id="search-form" class="header-search"><input type="search" id="search-input" placeholder="Buscar usuarios..."></form>
+    <form class="header-search search-form"><input type="search" class="search-input" placeholder="Buscar usuarios..."></form>
     <div class="header-links">
-      <button id="notification-bell" class="header-icon-button" title="Notificaciones">🔔<span id="notification-count" class="notification-badge" style="display: none;">0</span></button>
-      <div id="notification-dropdown" class="notification-menu" style="display: none;"></div>
+      <button class="notification-bell header-icon-button" title="Notificaciones" aria-expanded="false">
+        🔔
+        <span class="notification-count notification-badge" style="display: none;">0</span> 
+      </button>
+      <div class="notification-dropdown notification-menu" style="display: none;" role="dialog" aria-hidden="true">
+        <div class="notification-header">Notificaciones</div>
+        <div class="notification-list notification-items">
+          <p>No tienes notificaciones recientes.</p>
+        </div>
+      </div>
       <a href="#" id="show-profile-link" class="header-link">Mi Perfil</a> 
       <button id="logout-button">Cerrar Sesión</button>
     </div>

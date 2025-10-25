@@ -38,3 +38,182 @@ export async function registerUser(username, email, password){
     }
     return data;
 }
+
+export async function getPosts(token) {
+  const headers = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const response = await fetch(`${API_URL}/api/posts`, { headers });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Error al cargar el feed');
+  return data;
+}
+
+export async function createPost(formData, token) {
+  const response = await fetch(`${API_URL}/api/posts`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}` },
+    body: formData,
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Error al crear el post');
+  return data;
+}
+
+export async function likePost(postId, token) {
+  const response = await fetch(`${API_URL}/api/posts/${postId}/like`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Error al dar like');
+  return data;
+}
+
+export async function deletePost(postId, token) {
+  const response = await fetch(`${API_URL}/api/posts/${postId}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.message || 'Error al eliminar el post');
+  }
+  return { success: true };
+}
+
+export async function getMe(token) {
+  const response = await fetch(`${API_URL}/api/users/me`, {
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Error al cargar el perfil');
+  return data;
+}
+
+export async function getPets(token) {
+  const response = await fetch(`${API_URL}/api/pets`, {
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'No se pudieron cargar las mascotas');
+  return data;
+}
+
+export async function registerPet(petData, token) {
+  const response = await fetch(`${API_URL}/api/pets`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(petData),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Error al registrar la mascota');
+  return data;
+}
+
+export async function uploadPetPicture(petId, formData, token) {
+  const response = await fetch(`${API_URL}/api/pets/${petId}/upload-picture`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}` },
+    body: formData,
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Error al subir la foto de la mascota');
+  return data;
+}
+
+export async function deletePet(petId, token) {
+  const response = await fetch(`${API_URL}/api/pets/${petId}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.message || 'Error al eliminar la mascota');
+  }
+  return { success: true };
+}
+
+export async function searchUsers(query, token) {
+  const response = await fetch(`${API_URL}/api/users/search?q=${encodeURIComponent(query)}`, {
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Error en la búsqueda');
+  return data;
+}
+
+export async function getNotifications(token) {
+  const response = await fetch(`${API_URL}/api/notifications`, {
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Error al cargar notificaciones');
+  return data;
+}
+
+export async function markNotificationsRead(notificationIds, token) {
+  const response = await fetch(`${API_URL}/api/notifications/read`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ notificationIds }),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Error al marcar notificaciones');
+  return data;
+}
+
+export async function acceptFriendship(friendshipId, token) {
+  const response = await fetch(`${API_URL}/api/friendships/${friendshipId}/accept`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Error al aceptar solicitud');
+  return data;
+}
+
+export async function rejectFriendship(friendshipId, token) {
+  const response = await fetch(`${API_URL}/api/friendships/${friendshipId}/reject`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Error al rechazar solicitud');
+  return data;
+}
+
+export async function sendFriendRequest(userId, token) {
+  const response = await fetch(`${API_URL}/api/friendships/request/${userId}`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Error al enviar la solicitud');
+  return data;
+}
+
+export async function getUserPublicProfile(userId, token) {
+  const response = await fetch(`${API_URL}/api/users/${userId}`, {
+    headers: { 'Authorization': `Bearer ${token}` },
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Error al cargar el perfil');
+  return data;
+}
+
+export async function uploadProfilePicture(formData, token) {
+  const response = await fetch(`${API_URL}/api/users/me/picture`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}` },
+    body: formData,
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Error al subir la foto de perfil');
+  return data;
+}
