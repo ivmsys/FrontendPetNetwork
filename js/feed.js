@@ -23,87 +23,139 @@ let closeModalButton;
 
 // ... (imports, variables globales let feedContainer;, etc.) ...
 
+// js/feed.js
+
+// ... (imports y variables globales let feedContainer;, etc.) ...
+
 export function initFeed({ showView }) {
   showViewRef = showView;
 
-  // Asignar elementos DOM
+  // --- 1. Asignar Elementos del DOM ---
   feedContainer = document.getElementById('feed-container');
   console.log("Elemento feedContainer:", feedContainer); // Para depurar
   createPostForm = document.getElementById('create-post-form');
-  // ... (asignar el resto de elementos: postError, addMediaButton, etc.) ...
+  postError = document.getElementById('post-error');
+  addMediaButton = document.getElementById('add-media-button');
+  postMediaInput = document.getElementById('post-media-input');
+  postMediaPreviewContainer = document.getElementById('post-media-preview-container');
+  tagPetButton = document.getElementById('tag-pet-button');
+  petTagsContainer = document.getElementById('pet-tags-container');
+  petSelectionModal = document.getElementById('pet-selection-modal');
+  petSelectionList = document.getElementById('pet-selection-list');
+  closeModalButton = document.getElementById('close-modal-button');
 
-  // Añadir listeners a los elementos que SÍ existen siempre
+  // --- 2. Añadir Listeners a Elementos Específicos ---
   if (createPostForm) {
     createPostForm.addEventListener('submit', onCreatePostSubmit);
   }
-  // ... (listeners para addMediaButton, postMediaInput, etc.) ...
 
-  // Añadir listeners al feedContainer SOLO SI se encontró
-  if (feedContainer) { 
-    
-    // Listener para CLICS (likes, delete post, toggle comments)
-    feedContainer.addEventListener('click', onFeedContainerClick); 
-    
-    // Listener para SUBMITS (formulario de comentarios) <-- ¡PEGADO AQUÍ!
+  if (addMediaButton && postMediaInput) {
+    addMediaButton.addEventListener('click', () => postMediaInput.click());
+  }
+
+  if (postMediaInput) {
+    postMediaInput.addEventListener('change', onPostMediaChange);
+  }
+
+  if (postMediaPreviewContainer) {
+    postMediaPreviewContainer.addEventListener('click', onRemoveMediaPreview);
+  }
+
+  if (tagPetButton && petSelectionModal) {
+    tagPetButton.addEventListener('click', () => {
+      renderPetSelectionModal(); // Llama a la función que llena el modal
+      petSelectionModal.style.display = 'flex'; // Muestra el modal
+    });
+  }
+
+  if (closeModalButton && petSelectionModal) {
+    closeModalButton.addEventListener('click', () => {
+      petSelectionModal.style.display = 'none';
+    });
+    // Listener para cerrar modal al hacer clic fuera
+    petSelectionModal.addEventListener('click', (e) => {
+      if (e.target === petSelectionModal) {
+        petSelectionModal.style.display = 'none';
+      }
+    });
+  }
+
+  if (petSelectionList) {
+    petSelectionList.addEventListener('click', onSelectPetFromModal);
+  }
+
+  if (petTagsContainer) {
+    petTagsContainer.addEventListener('click', onRemovePetTag);
+  }
+
+  // --- 3. Añadir Listeners al Contenedor Principal del Feed ---
+  if (feedContainer) {
+
+    // Listener para CLICS delegados (likes, delete post, toggle comments)
+    feedContainer.addEventListener('click', onFeedContainerClick);
+
+    // Listener para SUBMITS delegados (formulario de comentarios)
     feedContainer.addEventListener('submit', async (e) => {
-        // --- Manejar envío de formulario de comentario ---
-        if (e.target.classList.contains('comment-form')) {
-            e.preventDefault();
-            const form = e.target;
-            const postId = form.dataset.postId;
-            const input = form.querySelector('.comment-input');
-            const button = form.querySelector('.comment-submit-btn');
-            const content = input.value.trim();
-            const token = localStorage.getItem('token');
+      // --- Manejar envío de formulario de comentario ---
+      if (e.target.classList.contains('comment-form')) {
+          e.preventDefault();
+          const form = e.target;
+          const postId = form.dataset.postId;
+          const input = form.querySelector('.comment-input');
+          const button = form.querySelector('.comment-submit-btn');
+          const content = input.value.trim();
+          const token = localStorage.getItem('token');
 
-            if (!content || !token) return;
+          if (!content || !token) return;
 
-            button.disabled = true;
+          button.disabled = true;
 
-            try {
-                const newCommentData = await addCommentToPost(postId, content, token); 
-                
-                // --- Lógica para añadir dinámicamente ---
-                const commentListContainer = document.querySelector(`#comments-${postId} .comment-list`);
-                if (commentListContainer) {
-                    const noCommentsMsg = commentListContainer.querySelector('p');
-                    if (noCommentsMsg && noCommentsMsg.textContent.includes('Sé el primero')) {
-                        commentListContainer.innerHTML = '';
-                    }
-                    
-                    const item = document.createElement('div');
-                    item.className = 'comment-item';
-                    // Asegúrate que formatTimeAgo esté disponible aquí (importado o global)
-                    const commentTime = typeof formatTimeAgo === 'function' ? formatTimeAgo(newCommentData.comment.created_at) : new Date(newCommentData.comment.created_at).toLocaleTimeString();
-                    item.innerHTML = `
-                      <span class="comment-author">${newCommentData.comment.author_username}:</span>
-                      <span class="comment-content">${newCommentData.comment.content}</span>
-                      <span class="comment-timestamp">${commentTime}</span>
-                    `;
-                    commentListContainer.appendChild(item); 
-                    
-                    // Actualizar contador visual (opcional)
-                    const toggleBtn = document.querySelector(`.toggle-comments-btn[data-post-id="${postId}"]`);
-                    const countSpan = toggleBtn?.querySelector('.comment-count-display');
-                    if(countSpan) {
-                         const currentCount = parseInt(countSpan.textContent, 10) || 0;
-                         countSpan.textContent = currentCount + 1;
-                    }
-                }
-                
-                input.value = ''; // Limpiar input
+          try {
+              const newCommentData = await addCommentToPost(postId, content, token);
 
-            } catch (error) {
-                alert(`Error al enviar comentario: ${error.message}`);
-            } finally {
-                button.disabled = false;
-            }
-        }
-    }); // <-- FIN DEL LISTENER DE SUBMIT PEGADO
+              // --- Lógica para añadir dinámicamente ---
+              const commentListContainer = document.querySelector(`#comments-${postId} .comment-list`);
+              if (commentListContainer) {
+                  const noCommentsMsg = commentListContainer.querySelector('p');
+                  if (noCommentsMsg && noCommentsMsg.textContent.includes('Sé el primero')) {
+                      commentListContainer.innerHTML = '';
+                  }
+
+                  const item = document.createElement('div');
+                  item.className = 'comment-item';
+                  // Asegúrate que formatTimeAgo esté disponible (importado o global/utils)
+                  const commentTime = typeof formatTimeAgo === 'function' ? formatTimeAgo(newCommentData.comment.created_at) : new Date(newCommentData.comment.created_at).toLocaleTimeString();
+                  item.innerHTML = `
+                    <span class="comment-author">${newCommentData.comment.author_username}:</span>
+                    <span class="comment-content">${newCommentData.comment.content}</span>
+                    <span class="comment-timestamp">${commentTime}</span>
+                  `;
+                  commentListContainer.appendChild(item);
+
+                  // Actualizar contador visual
+                  const toggleBtn = document.querySelector(`.toggle-comments-btn[data-post-id="${postId}"]`);
+                  const countSpan = toggleBtn?.querySelector('.comment-count-display');
+                  if(countSpan) {
+                       const currentCount = parseInt(countSpan.textContent, 10) || 0;
+                       countSpan.textContent = currentCount + 1;
+                  }
+              }
+
+              input.value = ''; // Limpiar input
+
+          } catch (error) {
+              alert(`Error al enviar comentario: ${error.message}`);
+          } finally {
+              button.disabled = false;
+          }
+      }
+      // --- Fin manejo form comentario ---
+    }); // <-- FIN DEL LISTENER DE SUBMIT
 
   } else {
-      console.error("¡ERROR! No se encontró el elemento #feed-container."); 
+      console.error("¡ERROR! No se encontró el elemento #feed-container.");
   }
+
 } // <-- FIN de initFeed
 
 export async function loadFeed() {

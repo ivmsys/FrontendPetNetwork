@@ -237,7 +237,7 @@
   margin-bottom: 1rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   position: relative;
-  padding-bottom: 3rem;
+  padding-bottom: 3.5rem;
 }
 
 .post-card .post-author {
@@ -344,13 +344,13 @@
 /* --- Estilos del Botón "Me Gusta" --- */
 
 .post-actions {
+  position: absolute; 
+  bottom: 1rem;  /* <-- AJUSTA: Distancia desde el borde inferior */
+  right: 1.5rem; /* <-- AJUSTA: Distancia desde el borde derecho */
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  position: absolute; 
-  bottom: 1.25rem; 
-  right: 1.5rem; 
-  background: none;
+  background: none; /* Asegúrate que no tenga fondo */
 }
 
 .like-button {
@@ -497,7 +497,7 @@
 
 .comments-section {
   margin-top: 1rem;
-  border-top: 1px solid #eee; /* Separador */
+  border-top: 1px solid #eee; 
   padding-top: 1rem;
 }
 
@@ -526,16 +526,18 @@
 }
 
 .comment-timestamp {
-  font-size: 0.75rem;
+  font-size: 0.5rem;
   color: #888;
-  margin-left: 0.5rem; /* Pequeño espacio a la izquierda */
+  margin-left: 0.25rem; /* Pequeño espacio a la izquierda */
   flex-shrink: 0;
+  margin-top: .5rem;
 }
 
 .comment-form {
   display: flex;
   gap: 0.5rem;
   margin-top: 0.5rem;
+  align-items: center; /* <-- AÑADE: Alinea verticalmente input y botón */
 }
 
 .comment-input {
@@ -544,10 +546,11 @@
   border: 1px solid #ddd;
   border-radius: 15px; /* Bordes redondeados */
   font-size: 0.85rem;
+  min-width: 0;
 }
 
 .comment-submit-btn {
-  width: auto; /* Ancho automático */
+  width: 20%; /* Ancho automático */
   padding: 8px 12px;
   font-size: 0.8rem;
   background-color: #e7f3ff; /* Azul claro */
