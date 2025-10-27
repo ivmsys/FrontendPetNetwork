@@ -1,112 +1,406 @@
-/* Lógica para mostrar/ocultar pantallas */
+/* Animaciones */
+@keyframes fadeInView {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Vistas */
 .view {
-  display: none; /* Oculta todas las vistas por defecto */
+  display: none;
 }
 
 .view.active {
-  display: block; /* Muestra solo la vista que tenga la clase 'active' */
+  display: block;
+  animation: fadeInView 0.4s ease-out;
 }
 
+/* Header */
 .app-header {
-  position: fixed; /* Fija el header arriba */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #ffffff;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   padding: 1rem 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(71, 184, 6, 0.12);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 2rem;
   box-sizing: border-box;
   z-index: 10;
+  transition: all 0.3s ease;
+  border-bottom: 2px solid rgba(71, 184, 6, 0.1);
 }
 
+.app-header:hover {
+  box-shadow: 0 4px 20px rgba(71, 184, 6, 0.18);
+}
+
+.header-logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #47b806;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.header-logo:hover {
+  transform: scale(1.05);
+}
+
+/* ⭐ CONTENEDOR DERECHO - Búsqueda + Links */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+/* ⭐ CONTENEDOR DE BÚSQUEDA */
+.header-search-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+}
+
+/* ⭐ INPUT WRAPPER - OCULTO POR DEFECTO */
+.search-input-wrapper {
+  display: none !important;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 50px;
+  padding: 0.5rem 1rem;
+  box-shadow: 
+    0 4px 16px rgba(71, 184, 6, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 2px solid rgba(71, 184, 6, 0.2);
+  position: absolute;
+  right: 60px;
+  min-width: 250px;
+  z-index: 100;
+}
+
+/* ⭐ CUANDO ESTÁ ACTIVO - Se muestra con animación */
+.search-input-wrapper.active {
+  display: flex !important;
+  animation: slideInFromRight 0.3s ease-out;
+}
+
+.search-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  outline: none;
+  color: #333;
+  min-width: 180px;
+}
+
+.search-input::placeholder {
+  color: #999;
+}
+
+/* Botón de cerrar búsqueda */
+.search-close-btn {
+  background: #f0f2f5;
+  color: #666;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.search-close-btn:hover {
+  background: #e4e6eb;
+  transform: rotate(90deg);
+}
+
+/* ⭐ BOTÓN DE LUPA - Siempre visible */
+.search-toggle-btn {
+  background: linear-gradient(135deg, #47b806, #5cd60a);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  font-size: 1.3rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(71, 184, 6, 0.3);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 50;
+}
+
+.search-toggle-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(71, 184, 6, 0.4);
+}
+
+.search-toggle-btn:active {
+  transform: scale(0.95);
+}
+
+/* Header links */
+.header-links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.header-link {
+  color: #47b806;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.header-link:hover {
+  background: rgba(71, 184, 6, 0.1);
+  transform: translateY(-2px);
+}
+
+#logout-button {
+  background: linear-gradient(135deg, #47b806, #5cd60a);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(71, 184, 6, 0.3);
+  white-space: nowrap;
+}
+
+#logout-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(71, 184, 6, 0.4);
+}
+
+/* Notification bell - Botón circular perfecto */
+.header-icon-button {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  position: relative;
+  /* ⭐ Hacer el botón perfectamente cuadrado */
+  width: 45px;
+  height: 45px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.header-icon-button:hover {
+  background: rgba(71, 184, 6, 0.1);
+  transform: scale(1.1);
+}
+
+.notification-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: #ff4444;
+  color: white;
+  border-radius: 50%;
+  min-width: 18px;
+  height: 18px;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  padding: 2px 4px;
+}
+
+/* Content */
 .app-content {
   width: 100%;
   max-width: 600px;
-  margin-top: 1rem; /* <-- CAMBIA ESTO (de 80px a 1rem) */
+  margin-top: 1rem;
   padding: 1rem;
+  position: relative;
+  z-index: 1;
 }
 
 .profile-content {
   width: 100%;
   max-width: 700px;
-  margin-top: 80px; /* Debajo del header fijo */
+  margin-top: 80px;
   padding: 1rem;
   box-sizing: border-box;
+  position: relative;
+  z-index: 1;
 }
 
-/* --- Estilos Responsivos --- */
-
-/* Aplica estos estilos cuando la pantalla mida 600px o menos */
-@media (max-width: 600px) {
-
-  /* Ajustes del Header */
+/* ⭐ RESPONSIVE - Móvil */
+@media (max-width: 768px) {
   .app-header {
-    padding: 0.5rem 1rem; /* Menos padding en pantallas pequeñas */
-    flex-wrap: wrap;     /* Permite que los elementos pasen a la siguiente línea */
-    justify-content: center; /* Centra los elementos cuando se envuelven */
-    gap: 0.5rem;          /* Espacio entre logo/búsqueda/links */
+    padding: 0.5rem 1rem;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    min-height: 60px;
   }
 
-  /* Ajustes del Logo en el Header 
   .header-logo {
-     /* Asegúrate de que el logo no ocupe toda la línea por sí solo 
-     /* Puedes mantenerlo o ajustar si es necesario, ej: text-align: center; 
-  }
-  */
-
-   .app-header h1 { /* Para el h1 dentro del logo */
-      font-size: 1.3rem; /* Hacer el título un poco más pequeño */
-   }
-
-
-  /* Ajustes de la Barra de Búsqueda */
-  .header-search {
-    order: 3; /* Manda la búsqueda a la segunda línea (después del logo y links) */
-    width: 100%; /* Ocupa todo el ancho en la segunda línea */
-    max-width: none; /* Quita el límite de ancho */
-    margin: 0; /* Quita márgenes horizontales */
-  }
-  #search-input {
-      font-size: 0.8rem; /* Texto de búsqueda más pequeño */
+    font-size: 1.3rem;
   }
 
+  .header-right {
+    gap: 0.3rem;
+  }
 
-  /* Ajustes de los Links/Botones de la Derecha */
+  /* ⭐ En móvil, el contenedor de búsqueda se posiciona diferente */
+  .header-search-container {
+    position: static;
+  }
+
+  /* ⭐ El input wrapper en móvil ocupa toda la línea inferior */
+  .search-input-wrapper {
+    position: fixed;
+    top: 60px; /* Justo debajo del header */
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
+    min-width: auto;
+    border-radius: 0;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 999;
+    box-sizing: border-box;
+  }
+
+  .search-input-wrapper.active {
+    animation: slideDown 0.3s ease-out;
+  }
+
+  .search-input {
+    font-size: 0.9rem;
+    min-width: auto;
+    width: 100%;
+  }
+
+  .search-close-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 1rem;
+  }
+
+  .search-toggle-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
+  }
+
   .header-links {
-      /* Asegúrate de que los links quepan bien */
-      gap: 0.5rem; /* Menos espacio entre links */
+    gap: 0.3rem;
   }
-   .header-link, #logout-button {
-      font-size: 0.8rem; /* Texto de links más pequeño */
-   }
-   #logout-button {
-       padding: 0.4rem 0.8rem; /* Botón de logout más pequeño */
-   }
-   button.header-icon-button { /* La campana */
-       font-size: 1.3rem;
-   }
 
+  .header-link {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.6rem;
+  }
 
-  /* Ajustes del Contenido Principal */
-  .app-content, 
+  #logout-button {
+    font-size: 0.7rem !important; 
+    padding: 0.2rem 0.8rem !important;
+    
+  }
+
+  .header-icon-button {
+    font-size: 1rem;
+    padding: 0.3rem;
+  }
+
+  .app-content,
   .profile-content,
   .create-post-container {
-    max-width: 100%; /* Ocupa todo el ancho */
-    margin-top: 110px; /* MÁS espacio para el header de dos líneas */
-    padding: 0.5rem;   /* Menos padding lateral */
-    box-sizing: border-box; /* Asegura que padding no aumente el tamaño */
-  }
-  
-  .create-post-container {
-      margin-top: 0; /* El contenedor de crear post ya no necesita margen superior extra */
+    max-width: 100%;
+    margin-top: 70px;
+    padding: 0.5rem;
+    box-sizing: border-box;
   }
 
-  /* Ajustar ancho de formularios iniciales */
   .form-container {
-      max-width: 90%;
-      padding: 1.5rem;
+    max-width: 90%;
+    padding: 1.5rem;
   }
+  .header-icon-button {
+    font-size: 1.2rem;
+    /* ⭐ Mantener el círculo perfecto en móvil */
+    width: 38px;
+    height: 38px;
+    padding: 0;
+  }
+  
+  .notification-badge {
+    top: 0;
+    right: 0;
+    min-width: 16px;
+    height: 16px;
+    font-size: 0.65rem;
+  }
+}
+
+/* ⭐ El form debe ser transparente al layout */
+.search-form {
+  display: contents; /* El form no afecta el layout */
+  margin: 0;
+  padding: 0;
 }

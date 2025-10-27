@@ -1,3 +1,28 @@
+/* Añadir al inicio de profile.css, search.css y notifications.css */
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+
 /* --- Estilos de Notificaciones --- */
 
 button.header-icon-button {
@@ -35,6 +60,7 @@ button.header-icon-button:hover {
   min-width: 18px; /* Ancho mínimo */
   text-align: center;
   box-sizing: border-box;
+  animation: pulse 2s infinite;
 }
 
 /* --- Estilos del Menú Desplegable de Notificaciones --- */
@@ -57,6 +83,7 @@ button.header-icon-button:hover {
   overflow-y: auto; /* Scroll si hay muchas notificaciones */
   z-index: 20; /* Asegura que esté por encima del contenido */
   margin-top: 0.5rem; /* Pequeño espacio desde el header */
+  animation: slideInRight 0.3s ease-out;
 }
 
 .notification-header {
@@ -77,12 +104,14 @@ button.header-icon-button:hover {
   border-bottom: 1px solid #eee;
   cursor: pointer; /* Indica que se puede hacer clic */
   font-size: 0.9rem;
+  transition: all 0.3s ease;
 }
 .notification-item:last-child {
   border-bottom: none;
 }
 .notification-item:hover {
   background-color: #f0f2f5;
+  transform: translateX(5px);
 }
 
 .notification-item span {
@@ -244,4 +273,13 @@ button.header-icon-button:hover {
         font-size: 0.7rem;
         padding: 0.2rem 0.5rem;
     }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
 }

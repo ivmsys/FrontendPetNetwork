@@ -1,18 +1,56 @@
-/* --- Estilos de la App Principal (Feed) --- */
+/* --- Estilos de la App Principal (Feed) con Animaciones --- */
 
-/*
-.app-header h1 {
-  margin: 0;
-  font-size: 1.5rem;
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-*/
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes heartBeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.2);
+  }
+  50% {
+    transform: scale(1);
+  }
+  75% {
+    transform: scale(1.1);
+  }
+}
 
 #logout-button {
-  width: auto; /* Ancho automático para el botón de logout */
-  padding: 0.5rem 1rem;
-  background-color: #f0f2f5;
-  color: #1877f2;
-  font-weight: bold;
+  background: linear-gradient(135deg, #47b806, #5cd60a);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(71, 184, 6, 0.3);
+  white-space: nowrap;
+}
+
+#logout-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(71, 184, 6, 0.4);
 }
 
 .app-content h2 {
@@ -24,16 +62,35 @@
 .create-post-container {
   width: 100%;
   max-width: 600px;
-  margin-top: 80px; /* Debajo del header fijo */
+  margin-top: 80px;
   padding: 1rem;
   box-sizing: border-box;
+  animation: slideInUp 0.5s ease-out;
+  position: relative;
+  z-index: 2; /* ⭐ Importante: Por encima del canvas */
 }
 
 #create-post-form {
-  background-color: #ffffff;
-  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.98); /* ⭐ Aumentar opacidad */
+  backdrop-filter: blur(10px); /* ⭐ Efecto glassmorphism */
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(71, 184, 6, 0.1); /* ⭐ Borde sutil verde */
+  position: relative;
+  z-index: 2;
+}
+
+#create-post-form:hover {
+  box-shadow: 
+    0 8px 24px rgba(71, 184, 6, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  border-color: rgba(71, 184, 6, 0.2);
 }
 
 #create-post-form h3 {
@@ -52,9 +109,14 @@
   box-sizing: border-box;
   margin-bottom: 1rem;
   resize: vertical;
+  transition: all 0.3s ease;
 }
 
-
+#create-post-form textarea:focus {
+  border-color: #1877f2;
+  box-shadow: 0 0 0 3px rgba(24, 119, 242, 0.1);
+  outline: none;
+}
 
 /* Estilos para la Tarjeta de Mascota */
 .pet-card {
@@ -63,7 +125,15 @@
   gap: 1.5rem;
   padding: 1rem;
   border-bottom: 1px solid #eee;
+  transition: all 0.3s ease;
+  animation: slideInUp 0.4s ease-out;
 }
+
+.pet-card:hover {
+  background-color: #f8f9fa;
+  transform: translateX(5px);
+}
+
 .pet-card:last-child {
   border-bottom: none;
 }
@@ -75,10 +145,16 @@
   object-fit: cover;
   background-color: #f0f2f5;
   border: 1px solid #ddd;
+  transition: all 0.3s ease;
+}
+
+.pet-card img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .pet-card-info {
-  flex: 1; /* Ocupa el espacio restante */
+  flex: 1;
 }
 
 .pet-card-info h3 {
@@ -107,7 +183,6 @@
 }
 
 /* --- Estilos de Etiquetado de Mascotas --- */
-
 .post-toolbar {
   display: flex;
   justify-content: space-between;
@@ -123,14 +198,18 @@
   background-color: #f0f2f5;
   color: #555;
   flex-grow: 0;
+  transition: all 0.3s ease;
 }
+
 #tag-pet-button:hover {
   background-color: #e4e6eb;
+  transform: rotate(5deg);
 }
 
 .submit-post-button {
-  flex-grow: 1; /* El botón de Publicar ocupa el resto */
+  flex-grow: 1;
   margin-left: 0.5rem;
+  transition: all 0.3s ease;
 }
 
 /* Estilos para las "píldoras" de etiquetas */
@@ -150,6 +229,13 @@
   padding: 0.25rem 0.75rem;
   font-size: 0.9rem;
   font-weight: 500;
+  animation: slideInUp 0.3s ease-out;
+  transition: all 0.3s ease;
+}
+
+.pet-tag-pill:hover {
+  background-color: #d0e7ff;
+  transform: translateY(-2px);
 }
 
 .pet-tag-remove-btn {
@@ -162,6 +248,12 @@
   cursor: pointer;
   padding: 0;
   line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.pet-tag-remove-btn:hover {
+  transform: rotate(90deg);
+  color: #d93025;
 }
 
 /* Estilos para el Modal (Menú) */
@@ -171,11 +263,18 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 100;
+  animation: fadeInOverlay 0.3s ease-out forwards;
+}
+
+@keyframes fadeInOverlay {
+  to {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
 }
 
 .modal-content {
@@ -184,6 +283,8 @@
   border-radius: 8px;
   width: 90%;
   max-width: 400px;
+  animation: slideInUp 0.3s ease-out;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
 }
 
 #pet-selection-list {
@@ -200,9 +301,12 @@
   gap: 0.5rem;
   padding: 0.75rem;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
+
 .pet-selection-item:hover {
   background-color: #f0f2f5;
+  transform: translateX(5px);
 }
 
 .pet-selection-item img {
@@ -210,34 +314,55 @@
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.pet-selection-item:hover img {
+  transform: scale(1.1);
 }
 
 /* --- Estilos de Subida de Media --- */
-
-/* Botón de añadir media (+) */
 #add-media-button {
   width: auto;
   padding: 0.5rem 0.8rem;
-  font-size: 1.5rem; /* Más grande */
+  font-size: 1.5rem;
   font-weight: bold;
   background-color: #f0f2f5;
   color: #555;
   flex-grow: 0;
-  margin-left: 0.5rem; /* Separación del @ */
+  margin-left: 0.5rem;
+  transition: all 0.3s ease;
 }
+
 #add-media-button:hover {
   background-color: #e4e6eb;
+  transform: rotate(90deg);
 }
 
 /* Estilos para cada "Tarjeta" de Post */
 .post-card {
-  background-color: #ffffff;
-  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.98); /* ⭐ Aumentar opacidad */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
   padding: 1.5rem;
   margin-bottom: 1rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.05);
   position: relative;
-  padding-bottom: 3.5rem;
+  animation: slideInUp 0.5s ease-out;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(71, 184, 6, 0.08);
+  z-index: 2; /* ⭐ Por encima del canvas */
+}
+
+.post-card:hover {
+  box-shadow: 
+    0 8px 24px rgba(71, 184, 6, 0.1),
+    0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-3px);
+  border-color: rgba(71, 184, 6, 0.15);
 }
 
 .post-card .post-author {
@@ -261,14 +386,11 @@
 }
 
 .post-card .post-timestamp {
-  font-size: 0.8rem;
+  font-size: 0.6rem;
   color: #888;
 }
 
 /* --- Estilos del Formulario de Crear Post --- */
-
-
-/* Contenedor de las Vistas Previas */
 #post-media-preview-container {
   display: flex;
   flex-wrap: wrap;
@@ -280,6 +402,7 @@
   position: relative;
   width: 80px;
   height: 80px;
+  animation: slideInUp 0.3s ease-out;
 }
 
 .media-preview-item img,
@@ -289,6 +412,12 @@
   object-fit: cover;
   border-radius: 6px;
   border: 1px solid #ddd;
+  transition: transform 0.3s ease;
+}
+
+.media-preview-item:hover img,
+.media-preview-item:hover video {
+  transform: scale(1.05);
 }
 
 .media-preview-remove-btn {
@@ -307,12 +436,18 @@
   line-height: 20px;
   text-align: center;
   padding: 0;
+  transition: all 0.3s ease;
+}
+
+.media-preview-remove-btn:hover {
+  background-color: #d93025;
+  transform: rotate(90deg);
 }
 
 /* Estilos para el Media en el Feed */
 .post-media-container {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* 2 columnas */
+  grid-template-columns: 1fr 1fr;
   gap: 0.25rem;
   margin-top: 1rem;
   border-radius: 8px;
@@ -326,31 +461,69 @@
   max-height: 300px;
   object-fit: cover;
   background-color: #f0f2f5;
+  transition: all 0.3s ease;
 }
 
-/* Si solo hay 1, ocupa todo */
+.post-media-item:hover img,
+.post-media-item:hover video {
+  transform: scale(1.02);
+  filter: brightness(1.1);
+}
+
 .post-media-container.count-1 { grid-template-columns: 1fr; }
-/* Si hay 3, la primera es grande */
+
 .post-media-container.count-3 {
   grid-template-columns: 1fr 1fr;
 }
+
 .post-media-container.count-3 .post-media-item:first-child {
-  grid-column: 1 / 3; /* Ocupa 2 columnas */
+  grid-column: 1 / 3;
   grid-row: 1 / 2;
 }
-/* Si hay 4, es un grid 2x2 */
+
 .post-media-container.count-4 { grid-template-columns: 1fr 1fr; }
 
 /* --- Estilos del Botón "Me Gusta" --- */
+.post-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #eee;
+}
+
+.toggle-comments-btn {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #555;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.toggle-comments-btn:hover {
+  background-color: #f0f2f5;
+  border-color: #1877f2;
+  color: #1877f2;
+  transform: translateY(-2px);
+}
+
+.comment-count-display {
+  font-size: 0.85rem;
+  font-weight: bold;
+}
 
 .post-actions {
-  position: absolute; 
-  bottom: 1rem;  /* <-- AJUSTA: Distancia desde el borde inferior */
-  right: 1.5rem; /* <-- AJUSTA: Distancia desde el borde derecho */
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: none; /* Asegúrate que no tenga fondo */
 }
 
 .like-button {
@@ -364,145 +537,93 @@
 }
 
 .like-button:hover {
-  transform: scale(1.1);
+  transform: scale(0.8);
+}
+
+.like-button:active {
+  animation: heartBeat 0.5s ease;
 }
 
 .like-button.liked {
-  /* El color rojo cuando SÍ le diste "me gusta" */
   filter: grayscale(0%);
+  animation: pulse 0.5s ease;
 }
 
 .like-button.not-liked {
-  /* El color gris cuando NO le diste "me gusta" */
   filter: grayscale(100%);
   opacity: 0.7;
 }
 
 .like-count {
-  font-size: 0.9rem;
+  font-size: 0.7rem;
   font-weight: bold;
   color: #555;
+  transition: all 0.3s ease;
 }
 
-@media (max-width: 600px) {
-  /* ... (Estilos del header y app-content que ya pusiste) ... */
-
-  /* Ajustes para Tarjetas de Post */
-  .post-card {
-    padding: 1rem; /* Menos padding */
-    padding-bottom: 2.5rem; /* Menos espacio para el botón de like */
-    font-size: 0.9rem; /* Texto un poco más pequeño en general */
-  }
-  .post-card .post-author {
-    font-size: 1rem; /* Ajustar tamaño del autor */
-  }
-  .post-card .post-content {
-    font-size: 0.9rem; /* Ajustar tamaño del contenido */
-  }
-  .post-actions {
-      bottom: 0.75rem; /* Ajustar posición del like */
-      right: 1rem;
-  }
-  .like-button {
-      font-size: 1.1rem; /* Botón like un poco más pequeño */
-  }
-  .like-count {
-      font-size: 0.8rem; /* Contador like más pequeño */
-  }
-
-  /* Ajustar grid de media en posts */
-   .post-media-container {
-       /* Forzar una sola columna en móvil si hay 2 o 4 fotos */
-       grid-template-columns: 1fr !important; 
-       max-height: 350px; /* Limitar altura en móvil */
-   }
-   .post-media-container.count-3 .post-media-item:first-child {
-       /* Quitar el span de 2 columnas en móvil */
-       grid-column: auto; 
-       grid-row: auto;
-   }
-   .post-media-item img, .post-media-item video {
-       max-height: 350px; 
-   }
-
-  /* Ajustes Formulario Crear Post (si es necesario) */
-  #create-post-form {
-    padding: 1rem; /* Menos padding */
-  }
-  #create-post-form h3 {
-      font-size: 1.1rem;
-  }
-  #post-media-preview-container {
-      gap: 0.3rem; /* Menos espacio entre previews */
-  }
-  .media-preview-item {
-      width: 60px; /* Previews más pequeñas */
-      height: 60px;
-  }
+.like-button:hover + .like-count {
+  color: #1877f2;
+  transform: scale(1.1);
 }
 
 /* Estilo para botón Eliminar Post*/
-.post-header { /* Nuevo contenedor para autor y botón */
-    display: flex;
-    margin-right: 2rem;
-    align-items: flex-start; /* Alinea arriba */
-    margin-bottom: 0.5rem; /* Espacio antes de etiquetas/contenido */
+.post-header {
+  display: flex;
+  margin-right: 2rem;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
 }
 
-/* styles/feed.css */
-
-/* styles/feed.css - REEMPLAZA los estilos de .delete-post-btn */
-
 .delete-post-btn {
-  position: absolute;   /* Posicionamiento absoluto */
-  top: 0.75rem;       /* Ajusta la distancia desde arriba */
-  right: 0.75rem;      /* Ajusta la distancia desde la derecha */
-
-  /* Anular estilos generales de botón y definir tamaño */
-  width: 28px;         /* Ancho fijo para un cuadrado pequeño */
-  height: 28px;        /* Alto fijo igual al ancho */
-  padding: 0;          /* Sin padding interno */
-  margin: 0;           /* Sin margen externo */
-
-  /* Estilo del botón 'X' */
-  background: none;       
-  border: none;           
-  color: #888;           
-  font-size: 1.5rem;      
-  font-weight: bold;      
-  line-height: 28px;     /* Centrar la 'X' verticalmente (igual al height) */
-  text-align: center;    /* Centrar la 'X' horizontalmente */
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 1.5rem;
+  font-weight: bold;
+  line-height: 28px;
+  text-align: center;
   cursor: pointer;
-  border-radius: 4px;     
-  z-index: 2;           
-
-  /* Para asegurar que no herede flex-grow u otros */
+  border-radius: 4px;
+  z-index: 2; /* ← Importante para que esté encima */
   flex-shrink: 0;
-  flex-grow: 0; 
+  flex-grow: 0;
+  transition: all 0.3s ease;
 }
 
 .delete-post-btn:hover {
-  color: #d93025;         
-  background-color: #f0f2f5; 
+  color: #d93025;
+  background-color: #f0f2f5;
+  transform: rotate(90deg);
 }
 
-/* Ajuste al contenedor del autor para dejar espacio */
+
+.delete-post-btn:hover {
+  color: #d93025;
+  background-color: #f0f2f5;
+  transform: rotate(90deg);
+}
+
 .post-header {
-    /* ... otros estilos ... */
-    /* Asegúrate de que no tenga 'justify-content: space-between;' si interfiere */
-    margin-right: 35px; /* Deja espacio a la derecha para el botón (ancho + algo de margen) */
+  margin-right: 35px;
 }
 
 /* --- Estilos de Comentarios --- */
-
 .comments-section {
   margin-top: 1rem;
-  border-top: 1px solid #eee; 
+  border-top: 1px solid #eee;
   padding-top: 1rem;
+  animation: slideInUp 0.4s ease-out;
 }
 
 .comment-list {
-  max-height: 200px; /* Limitar altura y añadir scroll */
+  max-height: 200px;
   overflow-y: auto;
   margin-bottom: 1rem;
 }
@@ -512,56 +633,137 @@
   gap: 0.5rem;
   margin-bottom: 0.75rem;
   font-size: 0.85rem;
+  animation: slideInUp 0.3s ease-out;
+  transition: all 0.3s ease;
+}
+
+.comment-item:hover {
+  background-color: #f8f9fa;
+  padding: 0.5rem;
+  border-radius: 6px;
 }
 
 .comment-author {
   font-weight: bold;
   color: #333;
-  flex-shrink: 0; /* Evitar que el nombre se encoja */
+  flex-shrink: 0;
 }
 
 .comment-content {
   color: #1c1e21;
-  word-break: break-word; /* Para textos largos */
+  word-break: break-word;
 }
 
 .comment-timestamp {
   font-size: 0.5rem;
   color: #888;
-  margin-left: 0.25rem; /* Pequeño espacio a la izquierda */
+  margin-left: 0.5rem;
   flex-shrink: 0;
-  margin-top: .5rem;
 }
 
 .comment-form {
   display: flex;
   gap: 0.5rem;
   margin-top: 0.5rem;
-  align-items: center; /* <-- AÑADE: Alinea verticalmente input y botón */
 }
 
 .comment-input {
-  flex-grow: 1; /* Ocupa el espacio restante */
+  flex-grow: 1;
   padding: 8px 10px;
   border: 1px solid #ddd;
-  border-radius: 15px; /* Bordes redondeados */
-  font-size: 0.85rem;
-  min-width: 0;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+}
+
+.comment-input:focus {
+  border-color: #1877f2;
+  box-shadow: 0 0 0 3px rgba(24, 119, 242, 0.1);
+  outline: none;
 }
 
 .comment-submit-btn {
-  width: 20%; /* Ancho automático */
+  width: 20%;
+  height: 30%;
   padding: 8px 12px;
   font-size: 0.8rem;
-  background-color: #e7f3ff; /* Azul claro */
-  color: #1877f2; /* Azul */
-  flex-shrink: 0; /* No encoger */
+  background-color: #e7f3ff;
+  color: #1877f2;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
 }
+
 .comment-submit-btn:hover {
-    background-color: #d0e7ff;
+  background-color: #d0e7ff;
+  transform: translateY(-2px);
 }
+
 .comment-submit-btn:disabled {
-    background-color: #f0f2f5;
-    color: #aaa;
-    cursor: default;
+  background-color: #f0f2f5;
+  color: #aaa;
+  cursor: default;
+}
+
+@media (max-width: 600px) {
+  .post-card {
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .post-card .post-author {
+    font-size: 1rem;
+  }
+
+  .post-card .post-content {
+    font-size: 0.9rem;
+  }
+
+  .post-footer {
+    flex-direction: row; /* Mantener horizontal */
+    gap: 0.5rem;
+  }
+
+  .toggle-comments-btn {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .like-button {
+    font-size: 1.1rem;
+  }
+
+  .like-count {
+    font-size: 0.8rem;
+  }
+
+  .post-media-container {
+    grid-template-columns: 1fr !important;
+    max-height: 350px;
+  }
+
+  .post-media-container.count-3 .post-media-item:first-child {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .post-media-item img, .post-media-item video {
+    max-height: 350px;
+  }
+
+  #create-post-form {
+    padding: 1rem;
+  }
+
+  #create-post-form h3 {
+    font-size: 1.1rem;
+  }
+
+  #post-media-preview-container {
+    gap: 0.3rem;
+  }
+
+  .media-preview-item {
+    width: 60px;
+    height: 60px;
+  }
 }

@@ -1,3 +1,26 @@
+/* Animaciones */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 /* --- Estilos del Perfil --- */
 
 .header-link {
@@ -13,133 +36,308 @@
   align-items: center;
 }
 
-
-
 .profile-section {
-  background-color: #ffffff;
-  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(71, 184, 6, 0.12);
+  animation: fadeInScale 0.5s ease-out;
+  transition: all 0.3s ease;
+  border: 2px solid rgba(71, 184, 6, 0.1);
+}
+
+.profile-section:hover {
+  box-shadow: 0 6px 20px rgba(71, 184, 6, 0.18);
+  transform: translateY(-2px);
 }
 
 .profile-section h2 {
   margin-top: 0;
-  color: #1877f2;
-  border-bottom: 1px solid #eee;
+  color: #47b806;
+  border-bottom: 2px solid rgba(71, 184, 6, 0.2);
   padding-bottom: 0.5rem;
+  font-size: 1.5rem;
 }
 
 /* --- Estilos de Foto de Perfil de Usuario --- */
 
 .user-profile-header {
   display: flex;
-  align-items: center; /* Centra verticalmente */
-  gap: 1.5rem; /* Espacio entre foto y datos */
+  align-items: center;
+  gap: 1.5rem;
   margin-bottom: 1rem;
 }
 
 .profile-picture-container {
-  position: relative; /* Para el botón superpuesto */
+  position: relative;
   text-align: center;
+  flex-shrink: 0;
 }
 
-#profile-picture-img {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%; /* Círculo */
+#profile-picture-img,
+#public-profile-picture-img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #ddd;
-  display: block; /* Para centrar */
-  margin: 0 auto 0.5rem auto; /* Centrar y espacio abajo */
+  border: 3px solid rgba(71, 184, 6, 0.3);
+  display: block;
+  margin: 0 auto 0.5rem auto;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#profile-picture-img:hover,
+#public-profile-picture-img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(71, 184, 6, 0.3);
+  border-color: #47b806;
 }
 
 .change-picture-button {
-  /* Estilo similar a otros botones pero más pequeño */
-  padding: 0.3rem 0.8rem;
-  font-size: 0.8rem;
-  background-color: #f0f2f5;
-  color: #333;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 0.4rem 1rem;
+  font-size: 0.85rem;
+  background: linear-gradient(135deg, #47b806, #5cd60a);
+  color: white;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(71, 184, 6, 0.3);
 }
+
 .change-picture-button:hover {
-  background-color: #e4e6eb;
+  background: linear-gradient(135deg, #5cd60a, #47b806);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(71, 184, 6, 0.4);
 }
 
-@media (max-width: 600px) {
-  /* Ajustes del Layout del Perfil */
+.user-details {
+  flex: 1;
+}
+
+.user-details p {
+  margin: 0.5rem 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.user-details strong {
+  color: #47b806;
+}
+
+/* --- Tarjetas de Mascota --- */
+
+.pet-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(71, 184, 6, 0.2);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  display: flex;
+  gap: 1rem;
+  animation: slideInRight 0.4s ease-out;
+}
+
+.pet-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(71, 184, 6, 0.15);
+  border-color: rgba(71, 184, 6, 0.4);
+}
+
+.pet-card img {
+  width: 100px;
+  height: 100px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2px solid rgba(71, 184, 6, 0.2);
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.pet-card img:hover {
+  transform: scale(1.05);
+  border-color: #47b806;
+}
+
+.pet-card-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.pet-card h3 {
+  color: #47b806;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.3rem;
+}
+
+.pet-card p {
+  margin: 0.25rem 0;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+/* Contenedor de acciones - Layout horizontal con espacio entre elementos */
+.pet-card-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(71, 184, 6, 0.2);
+}
+
+/* Formulario de subir foto */
+.upload-pet-photo-form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex: 1;
+}
+
+.upload-pet-photo-form input[type="file"] {
+  flex: 1;
+  font-size: 0.85rem;
+  padding: 0.3rem;
+  border: 1px solid rgba(71, 184, 6, 0.3);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.upload-pet-photo-form button {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  background: linear-gradient(135deg, #47b806, #5cd60a);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(71, 184, 6, 0.3);
+}
+
+.upload-pet-photo-form button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(71, 184, 6, 0.4);
+}
+
+/* Botón de eliminar mascota - ROJO */
+.delete-pet-btn {
+  width: auto;
+  margin: 0;
+  padding: 0.4rem 0.8rem;
+  background: linear-gradient(135deg, #dc3545, #c82333) !important;
+  color: white !important;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.delete-pet-btn:hover {
+  background: linear-gradient(135deg, #c82333, #bd2130) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+.delete-pet-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
+}
+
+/* --- RESPONSIVE: Móvil --- */
+@media (max-width: 768px) {
   .profile-section {
-    padding: 1rem; /* Menos padding */
-  }
-  .user-profile-header {
-    flex-direction: column; /* Apila foto y detalles */
-    align-items: center; /* Centra los elementos apilados */
-    gap: 0.5rem; /* Menos espacio */
-  }
-  .profile-picture-container {
-      margin-bottom: 0.5rem; /* Espacio bajo la foto/botón */
+    padding: 1rem;
+    margin-bottom: 1rem;
   }
 
-  /* Ajustar tamaño de foto (si quieres que sea diferente en móvil) */
-  #profile-view #profile-picture-img,
-  #public-profile-view #public-profile-picture-img {
-      width: 80px; 
-      height: 80px;
+  .user-profile-header {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .profile-picture-container {
+    margin-bottom: 0.5rem;
+  }
+
+  #profile-picture-img,
+  #public-profile-picture-img {
+    width: 100px;
+    height: 100px;
   }
 
   .user-details {
-      text-align: center; /* Centrar texto de detalles */
-      width: 100%; /* Ocupar ancho completo */
+    width: 100%;
+    text-align: center;
   }
-   .user-details p::before {
-       display: none; /* Ocultar los labels "Usuario:", etc. */
-   }
-   .user-details p {
-       margin: 0.2rem 0; /* Menos espacio vertical */
-   }
-   /* Para asegurar que el botón Add Friend se centre */
-   #public-profile-view .user-details {
-       align-items: center;
-   }
 
+  .user-details p {
+    margin: 0.3rem 0;
+    font-size: 0.9rem;
+  }
 
-  /* Ajustes Tarjetas de Mascota en Perfil */
+  /* Tarjetas de mascota en columna para móvil */
   .pet-card {
-    flex-direction: column; /* Apila foto e info */
-    align-items: center; /* Centra */
-    gap: 0.5rem;
-    padding: 0.5rem 0; /* Menos padding vertical, sin padding lateral */
-    text-align: center; /* Centrar texto de mascota */
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0.75rem;
   }
+
   .pet-card img {
-    width: 80px; /* Imagen mascota más pequeña */
+    width: 80px;
     height: 80px;
   }
-  .pet-card-info {
-      width: 100%; /* Ocupar ancho */
-  }
-  .upload-form {
-      margin-top: 0.5rem;
-  }
-}
 
-/* Estilo para botón Eliminar Mascota */
-.delete-pet-btn {
-  display: block; /* Ocupa su propia línea */
-  width: auto; /* Ancho ajustado al texto */
-  margin-top: 0.5rem;
-  margin-left: auto; /* Empuja a la derecha */
-  margin-right: auto; /* Centra si es block */
-  padding: 0.3rem 0.8rem;
-  font-size: 0.8rem;
-  background-color: #f8d7da; /* Rojo claro */
-  color: #721c24; /* Rojo oscuro */
-  border: 1px solid #f5c6cb;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.delete-pet-btn:hover {
-  background-color: #f5c6cb;
+  .pet-card-info {
+    width: 100%;
+  }
+
+  .pet-card h3 {
+    font-size: 1.1rem;
+  }
+
+  .pet-card p {
+    font-size: 0.85rem;
+  }
+
+  /* Acciones en columna para móvil */
+  .pet-card-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .upload-pet-photo-form {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .upload-pet-photo-form input[type="file"] {
+    width: 100%;
+  }
+
+  .upload-pet-photo-form button {
+    width: 100%;
+  }
+
+  .delete-pet-btn {
+    width: 100%;
+  }
 }
