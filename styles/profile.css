@@ -1,3 +1,27 @@
+/* Añadir al inicio de profile.css, search.css y notifications.css */
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 /* --- Estilos del Perfil --- */
 
 .header-link {
@@ -21,6 +45,13 @@
   padding: 1.5rem;
   margin-bottom: 1.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  animation: fadeInScale 0.5s ease-out;
+  transition: all 0.3s ease;
+}
+
+.profile-section:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
 }
 
 .profile-section h2 {
@@ -52,6 +83,12 @@
   border: 2px solid #ddd;
   display: block; /* Para centrar */
   margin: 0 auto 0.5rem auto; /* Centrar y espacio abajo */
+  transition: all 0.3s ease;
+}
+
+#profile-picture-img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .change-picture-button {
@@ -63,9 +100,13 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
+
 .change-picture-button:hover {
   background-color: #e4e6eb;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 @media (max-width: 600px) {

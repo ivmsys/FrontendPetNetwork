@@ -1,3 +1,28 @@
+/* Añadir al inicio de profile.css, search.css y notifications.css */
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+
 /* --- Estilos del Header Actualizados --- */
 
 .header-logo {
@@ -60,6 +85,13 @@
   border-radius: 8px;
   margin-bottom: 0.5rem;
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  animation: slideInRight 0.4s ease-out;
+  transition: all 0.3s ease;
+}
+
+.user-card:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .user-card img {
@@ -97,10 +129,13 @@
   font-weight: bold;
   cursor: pointer;
   white-space: nowrap; /* Prevent button text wrapping */
+  transition: all 0.3s ease;
 }
 
 .add-friend-btn:hover {
   background-color: #d0e7ff;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(24, 119, 242, 0.2);
 }
 
 .add-friend-btn.pending {
