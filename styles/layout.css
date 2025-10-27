@@ -1,11 +1,19 @@
-/* Lógica para mostrar/ocultar pantallas con animaciones */
-
+/* Animaciones */
 @keyframes fadeInView {
   from {
     opacity: 0;
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes gridMove {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 50px 50px;
   }
 }
 
@@ -18,24 +26,73 @@
   animation: fadeInView 0.4s ease-out;
 }
 
+/* ⭐ FEED con fondo base */
+#feed-view.active {
+  min-height: 100vh;
+  position: relative;
+  background: linear-gradient(135deg, #e8f5e9 0%, #f5fdf7 50%, #e0f2e9 100%);
+}
+
+/* Grid decorativo animado */
+#feed-view.active::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    linear-gradient(rgba(71, 184, 6, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(71, 184, 6, 0.06) 1px, transparent 1px);
+  background-size: 50px 50px;
+  z-index: 0;
+  pointer-events: none;
+  animation: gridMove 20s linear infinite;
+}
+
+/* Profile view */
+#profile-view.active {
+  min-height: 100vh;
+  position: relative;
+  background: linear-gradient(135deg, #e8f5e9 0%, #f5fdf7 50%, #e0f2e9 100%);
+}
+
+#profile-view.active::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    linear-gradient(rgba(71, 184, 6, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(71, 184, 6, 0.06) 1px, transparent 1px);
+  background-size: 50px 50px;
+  z-index: 0;
+  pointer-events: none;
+}
+
 .app-header {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #ffffff;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   padding: 1rem 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(71, 184, 6, 0.12);
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-sizing: border-box;
   z-index: 10;
   transition: all 0.3s ease;
+  border-bottom: 2px solid rgba(71, 184, 6, 0.1);
 }
 
 .app-header:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 20px rgba(71, 184, 6, 0.18);
 }
 
 .app-content {
@@ -43,6 +100,8 @@
   max-width: 600px;
   margin-top: 1rem;
   padding: 1rem;
+  position: relative;
+  z-index: 1;
 }
 
 .profile-content {
@@ -51,63 +110,23 @@
   margin-top: 80px;
   padding: 1rem;
   box-sizing: border-box;
+  position: relative;
+  z-index: 1;
 }
 
-/* --- Estilos Responsivos --- */
+/* Responsive */
 @media (max-width: 600px) {
   .app-header {
     padding: 0.5rem 1rem;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.5rem;
-  }
-
-  .app-header h1 {
-    font-size: 1.3rem;
-  }
-
-  .header-search {
-    order: 3;
-    width: 100%;
-    max-width: none;
-    margin: 0;
-  }
-
-  #search-input {
-    font-size: 0.8rem;
-  }
-
-  .header-links {
-    gap: 0.5rem;
-  }
-
-  .header-link, #logout-button {
-    font-size: 0.8rem;
-  }
-
-  #logout-button {
-    padding: 0.4rem 0.8rem;
-  }
-
-  button.header-icon-button {
-    font-size: 1.3rem;
-  }
-
-  .app-content,
-  .profile-content,
-  .create-post-container {
-    max-width: 100%;
-    margin-top: 110px;
-    padding: 0.5rem;
-    box-sizing: border-box;
-  }
-
-  .create-post-container {
-    margin-top: 0;
   }
 
   .form-container {
     max-width: 90%;
     padding: 1.5rem;
+  }
+  
+  .mouse-glow {
+    width: 400px;
+    height: 400px;
   }
 }

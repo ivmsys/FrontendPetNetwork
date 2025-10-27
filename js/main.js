@@ -7,7 +7,7 @@ import { initPublicProfile, loadPublicProfilePage } from './publicProfile.js';
 import { initNotifications, loadNotifications as moduleLoadNotifications } from './notifications.js';
 import { initFeed, loadFeed, loadUserPets } from './feed.js';
 import { initProfile, loadProfilePage } from './profile.js';
-
+import { initMouseBackground, cleanupMouseBackground } from './mousebackground.js';
 // --- 1. CONFIGURACIÓN ---
 // ¡¡¡CAMBIA ESTA URL POR LA TUYA DE RENDER!!!
 const API_URL = 'https://petnet-tuyr.onrender.com';
@@ -270,6 +270,7 @@ document.addEventListener('click', (e) => {
 // Comprobar si ya existe un token al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
   // Inicializar módulos (listeners y lógica propia)
+  initMouseBackground();
   initSearch({ showView, loadPublicProfilePage });
   initPublicProfile({ showView });
   initNotifications({ showView });
