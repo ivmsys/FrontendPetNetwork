@@ -44,33 +44,43 @@
   <div id="app-view" class="view">
 
   <header class="app-header">
-
-  <a href="#" id="back-to-feed-from-logo" class="header-logo">
-    <h1>PetNet</h1>
-  </a>
-
-  <form class="header-search search-form"> 
-    <input type="search" class="search-input" placeholder="Buscar usuarios...">
-  </form>
-
-  <div class="header-links">
-
-  <button class="notification-bell header-icon-button" title="Notificaciones" aria-expanded="false">
-    🔔
-    <span class="notification-count notification-badge" style="display: none;">0</span> 
-  </button>
-
-  <div class="notification-dropdown notification-menu" style="display: none;" role="dialog" aria-hidden="true">
-    <div class="notification-header">Notificaciones</div>
-    <div class="notification-list notification-items">
-      <p>No tienes notificaciones recientes.</p>
+  <a href="#" class="header-logo">PetNet</a>
+  
+  <!-- TODO A LA DERECHA: Búsqueda + Links -->
+  <div class="header-right">
+    <!-- Contenedor de búsqueda -->
+    <div class="header-search-container">
+      <!-- Input OCULTO por defecto -->
+      <div class="search-input-wrapper" id="search-input-wrapper">
+        <input type="search" class="search-input" id="search-input" placeholder="Buscar usuarios..." autocomplete="off">
+        <button type="button" class="search-close-btn" id="search-close-btn" title="Cerrar">✕</button>
+      </div>
+      <!-- Lupa siempre visible -->
+      <button class="search-toggle-btn" id="search-toggle-btn" title="Buscar">🔍</button>
+    </div>
+    
+    <!-- Links de navegación -->
+    <div class="header-links">
+      <!-- DESPUÉS -->
+      <button class="notification-bell header-icon-button" title="Notificaciones" aria-expanded="false">
+        🔔
+        <span class="notification-count notification-badge" style="display: none;">0</span> 
+      </button>
+      <div class="notification-dropdown notification-menu" style="display: none;" role="dialog" aria-hidden="true">
+        <div class="notification-header">Notificaciones</div>
+        <div class="notification-list notification-items">
+          <p>No tienes notificaciones recientes.</p>
+        </div>
+      </div>
+      <a href="#" class="header-link" id="profile-link">Mi Perfil</a>
+      <button id="logout-button">Cerrar Sesión</button>
     </div>
   </div>
-  <a href="#" id="show-profile-link" class="header-link">Mi Perfil</a> 
-  <button id="logout-button">Cerrar Sesión</button>
-</div>
-
 </header>
+
+
+
+
 
   <div class="create-post-container">
   <form id="create-post-form">
@@ -112,32 +122,43 @@
 </div>
 <div id="profile-view" class="view">
   <header class="app-header">
-
-  <a href="#" id="back-to-feed-from-logo" class="header-logo">
-    <h1>PetNet</h1>
-  </a>
-
-  <form class="header-search search-form"> 
-    <input type="search" class="search-input" placeholder="Buscar usuarios...">
-  </form>
-
-  <div class="header-links">
-
-  <button class="notification-bell header-icon-button" title="Notificaciones" aria-expanded="false">
-          🔔
-          <span class="notification-count notification-badge" style="display: none;">0</span> 
-        </button>
-        <div class="notification-dropdown notification-menu" style="display: none;" role="dialog" aria-hidden="true">
-          <div class="notification-header">Notificaciones</div>
-          <div class="notification-list notification-items">
-            <p>No tienes notificaciones recientes.</p>
-          </div>
+  <a href="#" class="header-logo">PetNet</a>
+  
+  <!-- TODO A LA DERECHA: Búsqueda + Links -->
+  <div class="header-right">
+    <!-- Contenedor de búsqueda -->
+    <div class="header-search-container">
+      <!-- Input OCULTO por defecto -->
+      <div class="search-input-wrapper" id="search-input-wrapper">
+        <input type="search" class="search-input" id="search-input" placeholder="Buscar usuarios..." autocomplete="off">
+        <button type="button" class="search-close-btn" id="search-close-btn" title="Cerrar">✕</button>
+      </div>
+      <!-- Lupa siempre visible -->
+      <button class="search-toggle-btn" id="search-toggle-btn" title="Buscar">🔍</button>
+    </div>
+    
+    <!-- Links de navegación -->
+    <div class="header-links">
+      <!-- DESPUÉS -->
+      <button class="notification-bell header-icon-button" title="Notificaciones" aria-expanded="false">
+        🔔
+        <span class="notification-count notification-badge" style="display: none;">0</span> 
+      </button>
+      <div class="notification-dropdown notification-menu" style="display: none;" role="dialog" aria-hidden="true">
+        <div class="notification-header">Notificaciones</div>
+        <div class="notification-list notification-items">
+          <p>No tienes notificaciones recientes.</p>
         </div>
-    <a href="#" id="show-profile-link" class="header-link">Mi Perfil</a> 
-    <button id="logout-button">Cerrar Sesión</button>
+      </div>
+      <a href="#" class="header-link" id="profile-link">Mi Perfil</a>
+      <button id="logout-button">Cerrar Sesión</button>
+    </div>
   </div>
+</header>
 
-  </header>
+
+
+
 
   <main class="profile-content">
 
@@ -183,14 +204,24 @@
 <div id="search-view" class="view">
 
   <header class="app-header">
-    <a href="#" id="back-to-feed-from-logo" class="header-logo">
-      <h1>PetNet</h1>
-    </a>
-    <form class="header-search search-form"> 
-      <input type="search" class="search-input" placeholder="Buscar usuarios...">
-    </form>
+  <a href="#" class="header-logo">PetNet</a>
+  
+  <!-- TODO A LA DERECHA: Búsqueda + Links -->
+  <div class="header-right">
+    <!-- Contenedor de búsqueda -->
+    <div class="header-search-container">
+      <!-- Input OCULTO por defecto -->
+      <div class="search-input-wrapper" id="search-input-wrapper">
+        <input type="search" class="search-input" id="search-input" placeholder="Buscar usuarios..." autocomplete="off">
+        <button type="button" class="search-close-btn" id="search-close-btn" title="Cerrar">✕</button>
+      </div>
+      <!-- Lupa siempre visible -->
+      <button class="search-toggle-btn" id="search-toggle-btn" title="Buscar">🔍</button>
+    </div>
+    
+    <!-- Links de navegación -->
     <div class="header-links">
-
+      <!-- DESPUÉS -->
       <button class="notification-bell header-icon-button" title="Notificaciones" aria-expanded="false">
         🔔
         <span class="notification-count notification-badge" style="display: none;">0</span> 
@@ -201,10 +232,15 @@
           <p>No tienes notificaciones recientes.</p>
         </div>
       </div>
-      <a href="#" id="show-profile-link" class="header-link">Mi Perfil</a> 
+      <a href="#" class="header-link" id="profile-link">Mi Perfil</a>
       <button id="logout-button">Cerrar Sesión</button>
     </div>
-  </header>
+  </div>
+</header>
+
+
+
+
 
   <main class="app-content" id="search-results-container">
   <h2>Resultados de Búsqueda</h2>
@@ -215,11 +251,26 @@
 <div id="public-profile-view" class="view">
 
   <header class="app-header">
-    <a href="#" id="back-to-feed-from-logo" class="header-logo"><h1>PetNet</h1></a>
-    <form class="header-search search-form"><input type="search" class="search-input" placeholder="Buscar usuarios..."></form>
+  <a href="#" class="header-logo">PetNet</a>
+  
+  <!-- TODO A LA DERECHA: Búsqueda + Links -->
+  <div class="header-right">
+    <!-- Contenedor de búsqueda -->
+    <div class="header-search-container">
+      <!-- Input OCULTO por defecto -->
+      <div class="search-input-wrapper" id="search-input-wrapper">
+        <input type="search" class="search-input" id="search-input" placeholder="Buscar usuarios..." autocomplete="off">
+        <button type="button" class="search-close-btn" id="search-close-btn" title="Cerrar">✕</button>
+      </div>
+      <!-- Lupa siempre visible -->
+      <button class="search-toggle-btn" id="search-toggle-btn" title="Buscar">🔍</button>
+    </div>
+    
+    <!-- Links de navegación -->
     <div class="header-links">
+      <!-- DESPUÉS -->
       <button class="notification-bell header-icon-button" title="Notificaciones" aria-expanded="false">
-        🔔
+    🔔
         <span class="notification-count notification-badge" style="display: none;">0</span> 
       </button>
       <div class="notification-dropdown notification-menu" style="display: none;" role="dialog" aria-hidden="true">
@@ -228,10 +279,12 @@
           <p>No tienes notificaciones recientes.</p>
         </div>
       </div>
-      <a href="#" id="show-profile-link" class="header-link">Mi Perfil</a> 
+      <a href="#" class="header-link" id="profile-link">Mi Perfil</a>
       <button id="logout-button">Cerrar Sesión</button>
     </div>
-  </header>
+  </div>
+</header>
+
 
   <main class="profile-content">
 
