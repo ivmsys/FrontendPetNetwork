@@ -133,61 +133,76 @@ document.addEventListener('click', (e) => {
 // ⭐ FUNCIÓN PARA INICIALIZAR EL SEARCH TOGGLE
 // ⭐ FUNCIÓN PARA INICIALIZAR EL SEARCH TOGGLE
 function initSearchToggle() {
-  const searchToggleBtn = document.getElementById('search-toggle-btn');
-  const searchInputWrapper = document.getElementById('search-input-wrapper');
-  const searchCloseBtn = document.getElementById('search-close-btn');
-  const searchInput = document.getElementById('search-input');
-
-  if (!searchToggleBtn || !searchInputWrapper || !searchCloseBtn || !searchInput) {
-    console.log('Elementos de búsqueda no encontrados en el DOM');
-    return;
-  }
-
-  // Abrir búsqueda
-  searchToggleBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    searchInputWrapper.classList.add('active');
-    setTimeout(() => {
-      searchInput.focus();
-    }, 300);
-  });
-
-  // Cerrar búsqueda
-  function closeSearch() {
-    searchInputWrapper.classList.remove('active');
-    searchInput.value = '';
-    searchInput.blur();
-  }
-
-  searchCloseBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    closeSearch();
-  });
-
-  // Cerrar con ESC
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && searchInputWrapper.classList.contains('active')) {
-      closeSearch();
-    }
-  });
-
-  // Cerrar al hacer clic fuera
+  // Obtener la vista activa
+  const getActiveView = () => document.querySelector('.view.active');
+  
+  // Toggle de búsqueda con delegación de eventos
   document.addEventListener('click', (e) => {
-    if (searchInputWrapper.classList.contains('active')) {
-      const isClickInsideSearch = searchInputWrapper.contains(e.target);
-      const isClickOnToggle = searchToggleBtn.contains(e.target);
+    const toggleBtn = e.target.closest('.search-toggle-btn');
+    const closeBtn = e.target.closest('.search-close-btn');
+    
+    if (toggleBtn) {
+      const activeView = getActiveView();
+      if (!activeView) return;
       
-      if (!isClickInsideSearch && !isClickOnToggle) {
-        closeSearch();
+      const searchWrapper = activeView.querySelector('.search-input-wrapper');
+      const searchInput = activeView.querySelector('.search-input');
+      
+      if (searchWrapper && searchInput) {
+        searchWrapper.classList.add('active');
+        setTimeout(() => searchInput.focus(), 100);
+      }
+    }
+    
+    if (closeBtn) {
+      const activeView = getActiveView();
+      if (!activeView) return;
+      
+      const searchWrapper = activeView.querySelector('.search-input-wrapper');
+      const searchInput = activeView.querySelector('.search-input');
+      
+      if (searchWrapper && searchInput) {
+        searchWrapper.classList.remove('active');
+        searchInput.value = '';
       }
     }
   });
-
-  // Prevenir que clics dentro del search lo cierren
-  searchInputWrapper.addEventListener('click', (e) => {
-    e.stopPropagation();
+  
+  // Cerrar con ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const activeView = getActiveView();
+      if (!activeView) return;
+      
+      const searchWrapper = activeView.querySelector('.search-input-wrapper');
+      const searchInput = activeView.querySelector('.search-input');
+      
+      if (searchWrapper && searchWrapper.classList.contains('active')) {
+        searchWrapper.classList.remove('active');
+        if (searchInput) searchInput.value = '';
+      }
+    }
+  });
+  
+  // Cerrar al hacer clic fuera
+  document.addEventListener('click', (e) => {
+    const activeView = getActiveView();
+    if (!activeView) return;
+    
+    const searchWrapper = activeView.querySelector('.search-input-wrapper');
+    
+    if (searchWrapper && searchWrapper.classList.contains('active')) {
+      const isClickInsideSearch = e.target.closest('.header-search-container');
+      
+      if (!isClickInsideSearch) {
+        searchWrapper.classList.remove('active');
+        const searchInput = activeView.querySelector('.search-input');
+        if (searchInput) searchInput.value = '';
+      }
+    }
   });
 }
+
 
 
 // --- 5. INICIALIZACIÓN ---

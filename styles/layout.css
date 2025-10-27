@@ -22,7 +22,7 @@
 @keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-10px);
   }
   to {
     opacity: 1;
@@ -227,16 +227,23 @@
   box-shadow: 0 4px 12px rgba(71, 184, 6, 0.4);
 }
 
-/* Notification bell */
+/* Notification bell - Botón circular perfecto */
 .header-icon-button {
   background: transparent;
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
   position: relative;
-  padding: 0.5rem;
+  /* ⭐ Hacer el botón perfectamente cuadrado */
+  width: 45px;
+  height: 45px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.3s ease;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .header-icon-button:hover {
@@ -246,8 +253,8 @@
 
 .notification-badge {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 2px;
+  right: 2px;
   background: #ff4444;
   color: white;
   border-radius: 50%;
@@ -258,6 +265,7 @@
   align-items: center;
   justify-content: center;
   font-weight: bold;
+  padding: 2px 4px;
 }
 
 /* Content */
@@ -284,18 +292,17 @@
 @media (max-width: 768px) {
   .app-header {
     padding: 0.5rem 1rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 0.5rem;
+    min-height: 60px;
   }
 
   .header-logo {
     font-size: 1.3rem;
-    order: 1;
   }
 
   .header-right {
-    gap: 0.5rem;
-    order: 2;
+    gap: 0.3rem;
   }
 
   /* ⭐ En móvil, el contenedor de búsqueda se posiciona diferente */
@@ -306,15 +313,17 @@
   /* ⭐ El input wrapper en móvil ocupa toda la línea inferior */
   .search-input-wrapper {
     position: fixed;
-    top: 65px; /* Justo debajo del header */
+    top: 60px; /* Justo debajo del header */
     left: 0;
-    right: auto;
+    right: 0;
     width: 100%;
+    max-width: 100%;
     min-width: auto;
     border-radius: 0;
     padding: 0.75rem 1rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 999;
+    box-sizing: border-box;
   }
 
   .search-input-wrapper.active {
@@ -324,46 +333,74 @@
   .search-input {
     font-size: 0.9rem;
     min-width: auto;
+    width: 100%;
+  }
+
+  .search-close-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 1rem;
   }
 
   .search-toggle-btn {
-    width: 40px;
-    height: 40px;
-    font-size: 1.1rem;
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
   }
 
   .header-links {
-    gap: 0.5rem;
+    gap: 0.3rem;
   }
 
-  .header-link,
+  .header-link {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.6rem;
+  }
+
   #logout-button {
-    font-size: 0.8rem;
-    padding: 0.4rem 0.8rem;
+    font-size: 0.7rem !important; 
+    padding: 0.2rem 0.8rem !important;
+    
   }
 
   .header-icon-button {
-    font-size: 1.3rem;
+    font-size: 1rem;
+    padding: 0.3rem;
   }
 
-  /* ⭐ Ajustar el margin del contenido cuando el search está activo */
   .app-content,
   .profile-content,
   .create-post-container {
     max-width: 100%;
-    margin-top: 80px;
+    margin-top: 70px;
     padding: 0.5rem;
     box-sizing: border-box;
-  }
-
-  /* ⭐ Cuando search está activo, dar más espacio */
-  .search-input-wrapper.active ~ .app-content,
-  .app-header:has(.search-input-wrapper.active) ~ .app-content {
-    margin-top: 130px;
   }
 
   .form-container {
     max-width: 90%;
     padding: 1.5rem;
   }
+  .header-icon-button {
+    font-size: 1.2rem;
+    /* ⭐ Mantener el círculo perfecto en móvil */
+    width: 38px;
+    height: 38px;
+    padding: 0;
+  }
+  
+  .notification-badge {
+    top: 0;
+    right: 0;
+    min-width: 16px;
+    height: 16px;
+    font-size: 0.65rem;
+  }
+}
+
+/* ⭐ El form debe ser transparente al layout */
+.search-form {
+  display: contents; /* El form no afecta el layout */
+  margin: 0;
+  padding: 0;
 }

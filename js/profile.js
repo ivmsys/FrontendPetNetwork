@@ -90,7 +90,7 @@ export async function loadProfilePage() {
               <button type="submit">Subir Foto</button>
             </form>
 
-            <button class="delete-pet-btn" data-pet-id="${pet.pet_id}">Eliminar</button>
+            <button class="delete-pet-btn" data-pet-id="${pet.pet_id}">Eliminar Mascota</button>
             </div>
         `;
         petListContainer.appendChild(petCard);

@@ -36,18 +36,21 @@
 }
 
 #logout-button {
-  width: 70%;
-  padding: 0.5rem 1rem;
-  background-color: #f0f2f5;
-  color: #1877f2;
-  font-size: .8rem;
-  font-weight: bold;
+  background: linear-gradient(135deg, #47b806, #5cd60a);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(71, 184, 6, 0.3);
+  white-space: nowrap;
 }
 
 #logout-button:hover {
-  background-color: #e4e6eb;
-  transform: translateX(-3px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(71, 184, 6, 0.4);
 }
 
 .app-content h2 {
@@ -57,7 +60,7 @@
 }
 
 .create-post-container {
-  width: 110%;
+  width: 100%;
   max-width: 600px;
   margin-top: 80px;
   padding: 1rem;
