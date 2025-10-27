@@ -216,12 +216,14 @@ export async function loadFeed() {
         mediaHtml += `</div>`;
       }
 
-      // ⭐ EXACTAMENTE COMO EN TU CÓDIGO ORIGINAL
       const currentUserId = localStorage.getItem('userId');
       let deleteButtonHtml = '';
-      if (currentUserId && post.author_id == currentUserId) {  // Usa == no ===
+      if (currentUserId && post.author_id == currentUserId) {
         deleteButtonHtml = `<button class="delete-post-btn" data-post-id="${post.post_id}" title="Eliminar post">&times;</button>`;
       }
+
+      // ⭐ Usar el comment_count del backend
+      const commentCount = post.comment_count || 0;
 
       postElement.innerHTML = `
         <div class="post-header"> 
@@ -241,7 +243,7 @@ export async function loadFeed() {
 
         <div class="post-footer">
           <button class="toggle-comments-btn" data-post-id="${post.post_id}">
-            💬 <span class="comment-count-display">0</span> Comentarios
+            💬 <span class="comment-count-display">${commentCount}</span> Comentarios
           </button>
           
           <div class="post-actions">
@@ -266,6 +268,7 @@ export async function loadFeed() {
     feedContainer.innerHTML = `<p class="error-message">Error al cargar el feed: ${error.message}</p>`;
   }
 }
+
 
 
 
