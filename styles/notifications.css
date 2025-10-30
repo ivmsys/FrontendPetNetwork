@@ -50,17 +50,18 @@ button.header-icon-button:hover {
 .notification-badge {
   position: absolute;
   top: 0px; /* <-- AJUSTA SI ES NECESARIO */
-  right: -1px; /* Posición a la derecha */
+  right: 3px; /* Posición a la derecha */
   background-color: red;
   color: white;
   border-radius: 50%; /* Círculo */
-  padding: 2px 5px; /* Tamaño del círculo */
-  font-size: 0.7rem; /* Tamaño del número */
+  padding: 3px 5px; /* Tamaño del círculo */
+  font-size: 0.6rem; /* Tamaño del número */
   font-weight: bold;
-  min-width: 18px; /* Ancho mínimo */
+  min-width: 15px; /* Ancho mínimo */
   text-align: center;
   box-sizing: border-box;
   animation: pulse 2s infinite;
+  z-index: 50;
 }
 
 /* --- Estilos del Menú Desplegable de Notificaciones --- */
@@ -94,6 +95,8 @@ button.header-icon-button:hover {
 
 .notification-items {
   padding: 0; /* Quita padding por defecto */
+  display: flex;         /* <-- AÑADE ESTO (si no está) */
+  flex-direction: column;
 }
 
 .notification-item {
