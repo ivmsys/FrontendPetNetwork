@@ -1,4 +1,4 @@
-const API_URL = 'http://api.mypetalk.com'; // Definimos la URL base aquí
+const API_URL = 'https://api.mypetalk.com'; // Definimos la URL base aquí
 
 export async function loginUser(email, password) {
     const response = await fetch(`${API_URL}/api/auth/login`, {
