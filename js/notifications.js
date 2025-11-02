@@ -92,43 +92,73 @@ function renderNotificationDropdown(activeView = document.querySelector('.view.a
   const container = activeView.querySelector('.notification-dropdown');
   const list = activeView.querySelector('.notification-list');
   if (!container || !list) return;
+
   const token = localStorage.getItem('token');
   if (!token) {
     container.style.display = 'none';
     list.innerHTML = '<p>No tienes notificaciones recientes.</p>';
     return;
   }
-  if (currentNotifications.length === 0) {
+
+  // Filtramos solo las no leídas (usando la variable global)
+  const unreadNotifications = currentNotifications.filter(n => !n.is_read);
+
+  if (unreadNotifications.length === 0) {
     list.innerHTML = '<p>No tienes notificaciones recientes.</p>';
     return;
   }
 
   list.innerHTML = '';
-  currentNotifications.forEach(n => {
+  unreadNotifications.forEach(n => {
     const item = document.createElement('div');
     item.className = 'notification-item';
     item.dataset.notificationId = n.notification_id;
-    item.dataset.relatedId = n.related_id;
+    item.dataset.relatedId = n.related_entity_id; // <-- Corregido (usa el ID de la entidad)
+    item.dataset.type = n.type;
+    item.dataset.senderId = n.sender_id;
+
     const timeAgo = formatTimeAgo(n.created_at);
-    const messageText = n.message ?? (n.type === 'friend_request' ? 'Solicitud de amistad' : 'Notificación');
+    let messageText = ''; // <-- Variable vacía
     let actionsHtml = '';
-    if (n.type === 'friend_request') {
-      actionsHtml = `
-        <div class="notification-actions">
-          <button class="notification-action-btn accept">Aceptar</button>
-          <button class="notification-action-btn reject">Rechazar</button>
-          <button class="notification-action-btn dismiss">Descartar</button>
-        </div>
-      `;
-    } else {
-      actionsHtml = `<div class="notification-actions"><button class="notification-action-btn dismiss">Descartar</button></div>`;
+
+    // Switch para construir el mensaje Y las acciones
+    switch (n.type) {
+      case 'friend_request':
+        messageText = `<strong>${n.sender_username || 'Alguien'}</strong> te envió una solicitud de amistad.`;
+        actionsHtml = `
+          <div class="notification-actions">
+            <button class="notification-action-btn accept">Aceptar</button>
+            <button class="notification-action-btn reject">Rechazar</button>
+            <button class="notification-action-btn dismiss">Descartar</button>
+          </div>
+        `;
+        break;
+
+      case 'friend_accepted': 
+        messageText = `<strong>${n.sender_username || 'Alguien'}</strong> aceptó tu solicitud de amistad.`;
+        actionsHtml = `<div class="notification-actions"><button class="notification-action-btn dismiss">Descartar</button></div>`;
+        break;
+
+      case 'like': 
+        messageText = `<strong>${n.sender_username || 'Alguien'}</strong> le dio Me Gusta a tu publicación.`;
+        actionsHtml = `<div class="notification-actions"><button class="notification-action-btn dismiss">Descartar</button></div>`;
+        break;
+
+      case 'comment': 
+        messageText = `<strong>${n.sender_username || 'Alguien'}</strong> comentó en tu publicación.`;
+        actionsHtml = `<div class="notification-actions"><button class="notification-action-btn dismiss">Descartar</button></div>`;
+        break;
+
+      default: // Caso genérico
+        messageText = n.message ?? 'Nueva notificación'; // Fallback por si acaso
+        actionsHtml = `<div class="notification-actions"><button class="notification-action-btn dismiss">Descartar</button></div>`;
     }
+
+    // Usar la estructura CSS grid correcta
     item.innerHTML = `
-      <div class="notification-content">
-        <p>${messageText}</p>
-        <small>${timeAgo}</small>
-      </div>
-      ${actionsHtml}
+        <span class="notification-text">${messageText}</span>
+        ${actionsHtml}
+        <span class="notification-time">${timeAgo}</span>
     `;
     list.appendChild(item);
   });
