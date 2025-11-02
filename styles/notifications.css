@@ -93,7 +93,9 @@ button.header-icon-button:hover {
 }
 
 .notification-items {
-  padding: 0; /* Quita padding por defecto */
+  padding: 0; 
+  display: flex;         /* <-- AÑADE ESTO (si no está) */
+  flex-direction: column;/* <-- AÑADE ESTO */
 }
 
 .notification-item {
